@@ -1,24 +1,34 @@
 package feaisil.raceforthegalaxy;
 
-import java.io.IOException;
-
 import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
 
 public final class AIPlayer extends Player {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public AIPlayer() {
+		super(false);
+	}
+	
+	public void notifyDefaultReply(Reply iRep)
+	{
+		// Rebotic user doesn't care
+	}
+
 	public void submitRequestImpl(Request iReq)
 	{
-		byte buffer[] = new byte[10];
 		System.out.print(iReq.getQueryText());
 
 		Reply aRep = new Reply();
 		
-		aRep.setReplyText("Im a PC");
+		aRep.setReplyText("Im a PC, I don't know what to do...");
 		aRep.setProcessingDone(true);
-
-		this.setChanged();
-		notifyObservers(aRep);
+		
+		setReply(aRep);
 	}
 	
 	@Override

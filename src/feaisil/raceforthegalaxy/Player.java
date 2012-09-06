@@ -1,11 +1,15 @@
 package feaisil.raceforthegalaxy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import feaisil.raceforthegalaxy.card.Card;
+import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
 
@@ -30,33 +34,56 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 	 */
 	private static final long serialVersionUID = 1L;
 	private static final long kMaxDecisionTime = 10000;
+	
 	private int victoryPoints;
+	private List<Card> hand;
+	private List<Card> board;
+	
 	private Request request;
 	private Reply reply;
 	private Thread playerThread;
 	private Timer timer;
 	private StopTask task;
+	private PlayerColor color;
+	private boolean simultaneous;
 	
-	public Player()
+	public Player(boolean iSimultaneous)
 	{
+		hand = new ArrayList<Card>(12);
+		board = new ArrayList<Card>(14);
 		timer = new Timer();
 		task = new StopTask(this);
 		playerThread = new Thread(this);
 		request = new Request();
 		reply = new Reply();
 		addObserver(this);
+		simultaneous = iSimultaneous;
 	}
 	
 	public void addVp(int iNumber) {
 		victoryPoints += iNumber;
 	}
 
-	public void submitRequest(Request iRequest)
+	synchronized public void submitRequest(Request iRequest)
 	{
 		request = iRequest;
 		reply.setProcessingDone(false);
-		playerThread.start();
-		timer.schedule(task, kMaxDecisionTime);
+		if(simultaneous)
+		{
+			playerThread.start();
+			timer.schedule(task, kMaxDecisionTime);
+		}
+		else
+		{
+			playerThread.start();
+			try {
+				wait(kMaxDecisionTime);
+			} catch (InterruptedException e) {
+				// Too bad... Default reply!
+			}
+			if(!reply.isProcessingDone())
+				setDefaultReply();
+		}
 	}
 	synchronized protected void handleRequestTimeOut() {
 		timer.cancel();
@@ -70,6 +97,9 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 
 	public void run() {
 		submitRequestImpl( request);
+		
+		this.setChanged();
+		notifyObservers();
 	}
 	
 	synchronized private void setDefaultReply() {
@@ -77,9 +107,12 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 		{
 			reply.setProcessingDone(true);
 			reply.setReplyText("default");
+			notifyDefaultReply(reply);
 		}
 	}
-	synchronized private void setReply(Reply iReply) {
+	abstract public void notifyDefaultReply(Reply iRep);
+
+	synchronized public void setReply(Reply iReply) {
 		if(!reply.isProcessingDone())
 		{
 			reply = iReply;
@@ -94,7 +127,6 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 	{
 		timer.cancel();
 		
-		setReply((Reply) iReply);
 		notifyAll();
 	}
 	
@@ -111,8 +143,42 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 		try {
 			wait(100);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			// Got interrupted... ignore
 		}
+	}
+
+	public PlayerColor getColor() {
+		return color;
+	}
+
+	public void setColor(PlayerColor color) {
+		this.color = color;
+	}
+
+	public List<Card> getHand() {
+		return hand;
+	}
+
+	public void addToHand(Card iCard) {
+		hand.add(iCard);
+	}	
+	public void removeFromHand(Card iCard) {
+		hand.remove(iCard);
+	}
+
+	public List<Card> getBoard() {
+		return board;
+	}
+
+	public void addToBoard(Card iCard) {
+		board.add(iCard);
+	}
+	public void removeFromBoard(Card iCard) {
+		board.remove(iCard);
+	}
+
+	protected boolean isSimultaneous() {
+		return simultaneous;
 	}
 
 }

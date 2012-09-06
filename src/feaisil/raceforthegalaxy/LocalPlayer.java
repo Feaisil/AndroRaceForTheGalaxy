@@ -3,13 +3,10 @@
  */
 package feaisil.raceforthegalaxy;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Observable;
-
+import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
+import feaisil.raceforthegalaxy.gui.UserInterface;
 
 /**
  * @author P. MEULEMAN
@@ -21,33 +18,32 @@ public final class LocalPlayer extends Player {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private UserInterface cli;
 
+	public LocalPlayer(UserInterface iCli) {
+		super(false);
+		cli = iCli;
+	}
+	
 	public void submitRequestImpl(Request iReq)
 	{
-		byte buffer[] = new byte[10];
-		System.out.print(iReq.getQueryText());
-		try {
-			System.in.read(buffer);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		Reply aRep = new Reply();
 		
-		InputStreamReader inputStreamReader = new InputStreamReader(System.in);
-		BufferedReader reader = new BufferedReader(inputStreamReader);
-		String aBuffer = "";
-		try {
-			aBuffer = reader.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		cli.showQueryDetails(this, iReq);
 		
-		aRep.setReplyText(aBuffer);
+		// TODO ERASE TEST
+		Card aCard = cli.chooseDiscardCard(getHand());
+		removeFromHand(aCard);
+		
+		aRep.setReplyText("Discarded card from hand: " + aCard);
 		aRep.setProcessingDone(true);
-
-		this.setChanged();
-		notifyObservers(aRep);
+		
+		setReply(aRep);
+	}
+	
+	public void notifyDefaultReply(Reply iRep)
+	{
+		System.out.println("Time out! Defaulting! Choose faster next time!");
 	}
 	
 	@Override

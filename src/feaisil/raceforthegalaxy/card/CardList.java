@@ -1,5 +1,6 @@
 package feaisil.raceforthegalaxy.card;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CardList {
@@ -8,6 +9,13 @@ public abstract class CardList {
 	private List<Card> StartingBlueWorlds;
 	private List<Card> StartingRedWorlds;
 	
+	public CardList()
+	{
+		Deck = new ArrayList<Card>(300);
+		StartingWorlds = new ArrayList<Card>(300);
+		StartingBlueWorlds = new ArrayList<Card>(10);
+		StartingRedWorlds = new ArrayList<Card>(10);
+	}
 	public abstract void initCardList();
 	
 	public final void addCard(Card iCard)

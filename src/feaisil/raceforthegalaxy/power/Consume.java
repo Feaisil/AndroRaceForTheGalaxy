@@ -1,5 +1,6 @@
 package feaisil.raceforthegalaxy.power;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import feaisil.raceforthegalaxy.Game;
@@ -11,15 +12,21 @@ import feaisil.raceforthegalaxy.common.Phase;
 public class Consume extends Power {
 	private GoodType goodType;
 	private int numberOfGood;
-	private List<Power>	 targets;
+	private List<Power>	 targets; // VERIFY TODO
 	
 	public Consume(GoodType iGoodType, int iNumberOfGood) {
 		super(Phase.consume);
+		
+		targets = new ArrayList<Power>();
+		
 		this.goodType = iGoodType;
 		numberOfGood = iNumberOfGood;
 	}
 	public Consume(GoodType iGoodType) {
 		super(Phase.consume);
+		
+		targets = new ArrayList<Power>();
+		
 		this.goodType = iGoodType;
 		numberOfGood = 1;
 	}

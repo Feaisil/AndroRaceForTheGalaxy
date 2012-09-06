@@ -1,58 +1,63 @@
 package feaisil.raceforthegalaxy.card;
 
+import java.util.ArrayList;
 import java.util.List;
  
 import feaisil.raceforthegalaxy.power.Power;
 import feaisil.raceforthegalaxy.victorypointbonus.VictoryPointBonus;
 
 public abstract class Card {
-	private String _name;
-	private int _cost;
-	private int _victoryPoints;
-	private List<Power> _powers;
-	private List<VictoryPointBonus> _victoryPointBonus;
-	private Object _owner;
+	private String name;
+	private int cost;
+	private int victoryPoints;
+	private List<Power> powers;
+	private List<VictoryPointBonus> victoryPointBonus;
+	private Object owner;
 
 	public Card(
 			String iName, 
 			int iCost, 
 			int iVictoryPoints) {
 		super();
-		this._name = iName;
-		this._cost = iCost;
-		this._victoryPoints = iVictoryPoints;
+		
+		powers = new ArrayList<Power>();
+		victoryPointBonus = new ArrayList<VictoryPointBonus>();		
+		
+		this.name = iName;
+		this.cost = iCost;
+		this.victoryPoints = iVictoryPoints;
 	}
 
 	public final String getName()
 	{
-		return _name;
+		return name;
 	}
 	public final int getCost()
 	{
-		return _cost;
+		return cost;
 	}
 	public final List<Power> getPowers() {
-		return _powers;
+		return powers;
 	}
 	public final List<VictoryPointBonus> getVictoryPointBonus() {
-		return _victoryPointBonus;
+		return victoryPointBonus;
 	}
 	
 	public final Object getOwner() {
-		return _owner;
+		return owner;
 	}
 	public final void setOwner(Object _owner) {
-		this._owner = _owner;
+		this.owner = _owner;
 	}
 	public final int getVictoryPoints() {
-		return _victoryPoints;
+		return victoryPoints;
 	}
 	
 	public final void addPower(Power iPower) {
-		_powers.add(iPower);
+		powers.add(iPower);
 	}
 	public final void addVictoryPointBonus(VictoryPointBonus iVPB){
-		_victoryPointBonus.add(iVPB);
+		victoryPointBonus.add(iVPB);
 	}
 
 	@Override
@@ -60,31 +65,31 @@ public abstract class Card {
 		final int _maxLen = 10;
 		StringBuilder _builder = new StringBuilder();
 		_builder.append("Card [");
-		if (_name != null) {
+		if (name != null) {
 			_builder.append("_name=");
-			_builder.append(_name);
+			_builder.append(name);
 			_builder.append(", ");
 		}
 		_builder.append("_cost=");
-		_builder.append(_cost);
+		_builder.append(cost);
 		_builder.append(", _victoryPoints=");
-		_builder.append(_victoryPoints);
+		_builder.append(victoryPoints);
 		_builder.append(", ");
-		if (_powers != null) {
+		if (powers != null) {
 			_builder.append("_powers=");
-			_builder.append(_powers.subList(0,
-					Math.min(_powers.size(), _maxLen)));
+			_builder.append(powers.subList(0,
+					Math.min(powers.size(), _maxLen)));
 			_builder.append(", ");
 		}
-		if (_victoryPointBonus != null) {
+		if (victoryPointBonus != null) {
 			_builder.append("_victoryPointBonus=");
-			_builder.append(_victoryPointBonus.subList(0,
-					Math.min(_victoryPointBonus.size(), _maxLen)));
+			_builder.append(victoryPointBonus.subList(0,
+					Math.min(victoryPointBonus.size(), _maxLen)));
 			_builder.append(", ");
 		}
-		if (_owner != null) {
+		if (owner != null) {
 			_builder.append("_owner=");
-			_builder.append(_owner);
+			_builder.append(owner);
 		}
 		_builder.append("]");
 		return _builder.toString();

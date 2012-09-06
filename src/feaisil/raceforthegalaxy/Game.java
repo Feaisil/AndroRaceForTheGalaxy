@@ -8,6 +8,7 @@ import java.util.Random;
 
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Goal;
+import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.common.Request;
 import feaisil.raceforthegalaxy.exception.*;
 
@@ -94,7 +95,12 @@ public final class Game implements Serializable{
 	{
 		if(players.size() >= 6)
 			throw new TwoManyPlayersException();
-		players.add(iPlayer);
+		
+		if(iPlayer.isSimultaneous())
+			players.add(0, iPlayer);
+		else
+			players.add(iPlayer);
+		iPlayer.setColor(PlayerColor.values()[players.size()]);
 	}
 	
 	@Override
@@ -172,10 +178,13 @@ public final class Game implements Serializable{
 			while(!aP.getReply().isProcessingDone())
 				aP.waitResponse();
 		}
-
+		System.out.println();
 		for (Player aP : players)
 		{
+			System.out.println("--------");
+			System.out.println(aP);
 			System.out.println(aP.getReply());
 		}
+		System.out.println();
 	}
 }

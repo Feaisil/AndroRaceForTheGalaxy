@@ -8,6 +8,8 @@ public class Request implements Serializable  {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String queryText;
+	
+	private Phase phase;
 
 	@Override
 	public String toString() {
@@ -27,6 +29,14 @@ public class Request implements Serializable  {
 
 	public void setQueryText(String queryText) {
 		this.queryText = queryText;
+	}
+
+	public Phase getPhase() {
+		return phase;
+	}
+
+	public void setPhase(Phase phase) {
+		this.phase = phase;
 	}
 	
 }
