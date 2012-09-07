@@ -16,8 +16,6 @@ public class Main {
 		AIPlayer aPl1 = new AIPlayer();		
 		LocalPlayer aPl2 = new LocalPlayer(cli);
 		LocalPlayer aPl3 = new LocalPlayer(cli);
-		CopyOfLocalPlayer aPl4 = new CopyOfLocalPlayer(cli);
-		CopyOfLocalPlayer aPl5 = new CopyOfLocalPlayer(cli);
 		
 		CardList aCl = new BaseCardList();
 		
@@ -27,10 +25,6 @@ public class Main {
 			aPl2.addToHand(aCard);
 		for(Card aCard: aCl.getStartingRedWorlds())
 			aPl3.addToHand(aCard);
-		for(Card aCard: aCl.getStartingBlueWorlds())
-			aPl4.addToHand(aCard);
-		for(Card aCard: aCl.getStartingRedWorlds())
-			aPl5.addToHand(aCard);
 		
 		Game aGame = new Game();
 		

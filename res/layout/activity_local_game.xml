@@ -2,15 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+	
     <HorizontalScrollView
         android:id="@+id/choosecardlist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentBottom="false"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="false" >
 
         <LinearLayout
             android:id="@+id/chosecardlistlayout"
@@ -19,6 +19,40 @@
             android:orientation="horizontal" >
 
         </LinearLayout>
+
     </HorizontalScrollView>
+
+	<Button
+	    android:id="@+id/button1"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="false"
+	    android:layout_below="@id/choosecardlist"
+	    android:text="Accept" />
+
+	<TextView
+	    android:id="@+id/textView1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@id/choosecardlist"
+	    android:layout_alignParentLeft="false"
+	    android:layout_alignParentTop="true"
+	    android:layout_centerHorizontal="true"
+	    android:layout_marginLeft="24dp"
+	    android:text="Player: "
+	    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	<TextView
+	    android:id="@+id/PlayerName"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@id/choosecardlist"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:layout_marginLeft="24dp"
+	    android:layout_toRightOf="@id/textView1"
+	    android:text="None"
+	    android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

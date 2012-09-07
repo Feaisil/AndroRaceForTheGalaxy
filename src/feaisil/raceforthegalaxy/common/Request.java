@@ -10,6 +10,13 @@ public class Request implements Serializable  {
 	private String queryText;
 	
 	private Phase phase;
+	public long id;
+	static long lastId = 0;
+	
+	public Request()
+	{
+		id = lastId++;
+	}
 
 	@Override
 	public String toString() {

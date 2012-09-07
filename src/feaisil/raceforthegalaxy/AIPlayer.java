@@ -23,7 +23,7 @@ public final class AIPlayer extends Player {
 	{
 		System.out.print(iReq.getQueryText());
 
-		Reply aRep = new Reply();
+		Reply aRep = new Reply(iReq);
 		
 		aRep.setReplyText("Im a PC, I don't know what to do...");
 		aRep.setProcessingDone(true);

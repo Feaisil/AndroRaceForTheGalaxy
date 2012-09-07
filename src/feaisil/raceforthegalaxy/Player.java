@@ -13,7 +13,7 @@ import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
 
-abstract public class Player extends Observable implements Observer, Runnable, Serializable {
+abstract public class Player implements Runnable, Serializable {
 	private class StopTask extends TimerTask
 	{
 		private Player originator;
@@ -33,7 +33,7 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final long kMaxDecisionTime = 10000;
+	public static final long kMaxDecisionTime = 10000;
 	
 	private int victoryPoints;
 	private List<Card> hand;
@@ -55,8 +55,7 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 		task = new StopTask(this);
 		playerThread = new Thread(this);
 		request = new Request();
-		reply = new Reply();
-		addObserver(this);
+		reply = new Reply(request);
 		simultaneous = iSimultaneous;
 	}
 	
@@ -67,6 +66,7 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 	synchronized public void submitRequest(Request iRequest)
 	{
 		request = iRequest;
+		reply = new Reply(request);
 		reply.setProcessingDone(false);
 		if(simultaneous)
 		{
@@ -97,9 +97,8 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 
 	public void run() {
 		submitRequestImpl( request);
-		
-		this.setChanged();
-		notifyObservers();
+
+		notifyAll();
 	}
 	
 	synchronized private void setDefaultReply() {
@@ -121,13 +120,6 @@ abstract public class Player extends Observable implements Observer, Runnable, S
 	
 	public Reply getReply() {
 		return reply;
-	}
-
-	synchronized public void update(Observable iObs, Object iReply)
-	{
-		timer.cancel();
-		
-		notifyAll();
 	}
 	
 	@Override

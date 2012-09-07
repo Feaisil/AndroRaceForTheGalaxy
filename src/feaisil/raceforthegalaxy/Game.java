@@ -12,7 +12,7 @@ import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.common.Request;
 import feaisil.raceforthegalaxy.exception.*;
 
-public final class Game implements Serializable{
+public final class Game implements Serializable, Runnable{
 	/**
 	 * 
 	 */
@@ -186,5 +186,9 @@ public final class Game implements Serializable{
 			System.out.println(aP.getReply());
 		}
 		System.out.println();
+	}
+
+	public void run() {
+		startGame();
 	}
 }

@@ -10,6 +10,7 @@ public interface UserInterface {
 
 	public abstract void showQueryDetails(Player iPlayer, Request iRequest);
 
-	public abstract Card chooseDiscardCard(List<Card> iCards);
-
+	public abstract void displayCardToChoose(List<Card> iCards, int iNumber, ChooseAction iAction);
+	public abstract List<Card> getChoosenCards();
+	public abstract void responseTimeOut();
 }

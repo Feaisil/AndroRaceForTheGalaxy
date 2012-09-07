@@ -3,9 +3,12 @@
  */
 package feaisil.raceforthegalaxy;
 
+import java.util.List;
+
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
+import feaisil.raceforthegalaxy.gui.ChooseAction;
 import feaisil.raceforthegalaxy.gui.UserInterface;
 
 /**
@@ -18,24 +21,27 @@ public final class LocalPlayer extends Player {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private UserInterface cli;
+	private UserInterface ui;
 
-	public LocalPlayer(UserInterface iCli) {
+	public LocalPlayer(UserInterface iUi) {
 		super(false);
-		cli = iCli;
+		ui = iUi;
 	}
 	
 	public void submitRequestImpl(Request iReq)
 	{
-		Reply aRep = new Reply();
+		Reply aRep = new Reply(iReq);
 		
-		cli.showQueryDetails(this, iReq);
+		ui.showQueryDetails(this, iReq);
 		
 		// TODO ERASE TEST
-		Card aCard = cli.chooseDiscardCard(getHand());
-		removeFromHand(aCard);
+		ui.displayCardToChoose(getHand(), 1, ChooseAction.discard);
 		
-		aRep.setReplyText("Discarded card from hand: " + aCard);
+		List<Card> cards = ui.getChoosenCards();
+		for(Card aCard: cards)
+			removeFromHand(aCard);
+		
+		aRep.setReplyText("Discarded card from hand");
 		aRep.setProcessingDone(true);
 		
 		setReply(aRep);
@@ -43,7 +49,7 @@ public final class LocalPlayer extends Player {
 	
 	public void notifyDefaultReply(Reply iRep)
 	{
-		System.out.println("Time out! Defaulting! Choose faster next time!");
+		ui.responseTimeOut();
 	}
 	
 	@Override
