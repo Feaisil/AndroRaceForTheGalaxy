@@ -6,6 +6,7 @@ import java.util.List;
 import feaisil.raceforthegalaxy.Game;
 import feaisil.raceforthegalaxy.LocalPlayer;
 import feaisil.raceforthegalaxy.Player;
+import feaisil.raceforthegalaxy.PlayerInterface;
 import feaisil.raceforthegalaxy.card.BaseCardList;
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.card.CardList;
@@ -22,6 +23,7 @@ import android.os.Message;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -31,7 +33,7 @@ import android.support.v4.app.NavUtils;
 public class LocalGameActivity extends Activity implements UserInterface {
 
 	private Game game;
-	private Player currentPlayer;
+	private PlayerInterface currentPlayer;
 	
 	private LocalGameActivity current = this;
 	
@@ -104,12 +106,16 @@ public class LocalGameActivity extends Activity implements UserInterface {
 		displayCardToChooseHandler = new Handler()
 		{
 			public void handleMessage(Message msg) {
-				LinearLayout aLayout = (LinearLayout)findViewById(R.id.chosecardlistlayout);
+				LinearLayout aLayout = (LinearLayout)findViewById(R.id.choosecardlistlayout);
 				
 				aLayout.removeAllViewsInLayout();
+				
+				cardImages = new ArrayList<SelectableCard>( ((List<Card>)msg.obj).size());
 				for(Card aCard : (List<Card>)msg.obj)
 				{
 					SelectableCard aImg = new SelectableCard(current, aCard);
+					
+					cardImages.add(aImg);
 					aLayout.addView(aImg);
 				}
 				
@@ -175,13 +181,23 @@ public class LocalGameActivity extends Activity implements UserInterface {
 		for(SelectableCard aCard: cardImages)
 		{
 			if(aCard.isSelected())
+			{
+				System.err.println(""+ aCard.getCard());
 				aResult.add(aCard.getCard());
+			}
+			else
+				System.err.println(""+ aCard.getCard());
 		}
+		System.err.println("Cards: "+aResult);
 		return aResult;
 	}
 	
-	public void responseTimeOut()
+	synchronized public void responseTimeOut()
 	{
+		LinearLayout aLayout = (LinearLayout)findViewById(R.id.choosecardlistlayout);
+		
+		aLayout.removeAllViewsInLayout();
+		
 		notifyAll();
 	}
 	
@@ -191,6 +207,15 @@ public class LocalGameActivity extends Activity implements UserInterface {
 		else
 			numberOfCardsChosen--;
 		this.findViewById(R.id.button1).setEnabled(numberOfCardsChosen == numberOfCardsToChoose);
+	}
+	
+	synchronized public void onCardChoosed(View aView)
+	{
+		LinearLayout aLayout = (LinearLayout)findViewById(R.id.choosecardlistlayout);
+		
+		aLayout.removeAllViewsInLayout();
+		
+		notifyAll();
 	}
 
 }

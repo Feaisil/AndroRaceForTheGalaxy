@@ -3,7 +3,7 @@ package feaisil.raceforthegalaxy.common;
 import java.io.Serializable;
 
 public class Reply implements Serializable {
-	long id;
+	public long id;
 	public Reply(Request iReq) {
 		id = iReq.id;
 	}

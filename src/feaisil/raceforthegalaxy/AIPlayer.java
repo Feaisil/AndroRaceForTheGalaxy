@@ -1,7 +1,9 @@
 package feaisil.raceforthegalaxy;
 
+import feaisil.raceforthegalaxy.common.Action;
 import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
+import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
 
 public final class AIPlayer extends Player {
 
@@ -10,25 +12,8 @@ public final class AIPlayer extends Player {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public AIPlayer() {
-		super(false);
-	}
-	
-	public void notifyDefaultReply(Reply iRep)
-	{
-		// Rebotic user doesn't care
-	}
-
-	public void submitRequestImpl(Request iReq)
-	{
-		System.out.print(iReq.getQueryText());
-
-		Reply aRep = new Reply(iReq);
-		
-		aRep.setReplyText("Im a PC, I don't know what to do...");
-		aRep.setProcessingDone(true);
-		
-		setReply(aRep);
+	public AIPlayer(Game iGame) throws TwoManyPlayersException {
+		super(iGame, false);
 	}
 	
 	@Override
@@ -41,6 +26,10 @@ public final class AIPlayer extends Player {
 		}
 		_builder.append("]");
 		return _builder.toString();
+	}
+
+	public Action selectAction(boolean prestigeActionUsed) {
+		return Action.exploreDraw;
 	}
 
 }

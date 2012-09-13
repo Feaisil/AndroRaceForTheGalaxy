@@ -6,7 +6,9 @@ import java.util.Map;
 import feaisil.androraceforthegalaxy.LocalGameActivity;
 import feaisil.androraceforthegalaxy.R;
 import feaisil.raceforthegalaxy.card.Card;
+import android.R.color;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -49,6 +51,10 @@ public class SelectableCard extends ImageButton {
 			{
 				public void onClick(View v) {
 					v.setSelected(!v.isSelected());
+					if(v.isSelected())
+						((SelectableCard)v).setColorFilter(Color.argb(100, 0, 200, 0));
+					else
+						((SelectableCard)v).setColorFilter(Color.argb(0, 0, 200, 0));
 					((LocalGameActivity) v.getContext()).cardSelected(v.isSelected());
 				}
 			});

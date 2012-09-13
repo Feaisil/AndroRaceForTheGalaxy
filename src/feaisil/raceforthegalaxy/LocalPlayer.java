@@ -6,8 +6,10 @@ package feaisil.raceforthegalaxy;
 import java.util.List;
 
 import feaisil.raceforthegalaxy.card.Card;
+import feaisil.raceforthegalaxy.common.Action;
 import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
+import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
 import feaisil.raceforthegalaxy.gui.ChooseAction;
 import feaisil.raceforthegalaxy.gui.UserInterface;
 
@@ -23,34 +25,18 @@ public final class LocalPlayer extends Player {
 	private static final long serialVersionUID = 1L;
 	private UserInterface ui;
 
-	public LocalPlayer(UserInterface iUi) {
-		super(false);
+	public LocalPlayer(Game iGame, UserInterface iUi) throws TwoManyPlayersException {
+		super(iGame, false);
 		ui = iUi;
 	}
 	
-	public void submitRequestImpl(Request iReq)
-	{
-		Reply aRep = new Reply(iReq);
-		
-		ui.showQueryDetails(this, iReq);
-		
-		// TODO ERASE TEST
-		ui.displayCardToChoose(getHand(), 1, ChooseAction.discard);
-		
-		List<Card> cards = ui.getChoosenCards();
-		for(Card aCard: cards)
-			removeFromHand(aCard);
-		
-		aRep.setReplyText("Discarded card from hand");
-		aRep.setProcessingDone(true);
-		
-		setReply(aRep);
+	public Action selectAction(boolean prestigeActionUsed) {
+		// TODO query ui
+		//ui.getChoosenCards();
+		return Action.trade;
 	}
 	
-	public void notifyDefaultReply(Reply iRep)
-	{
-		ui.responseTimeOut();
-	}
+	
 	
 	@Override
 	public String toString() {

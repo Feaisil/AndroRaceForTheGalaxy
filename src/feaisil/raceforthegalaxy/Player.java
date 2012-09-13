@@ -9,117 +9,324 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import feaisil.raceforthegalaxy.card.Card;
+import feaisil.raceforthegalaxy.common.Action;
+import feaisil.raceforthegalaxy.common.Phase;
 import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
+import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
 
-abstract public class Player implements Runnable, Serializable {
-	private class StopTask extends TimerTask
-	{
-		private Player originator;
-		
-		public StopTask(Player iOrig)
-		{
-			originator = iOrig;
-		}
-		
-		@Override
-		public void run() {
-			originator.handleRequestTimeOut();
-		}
-		
-	}
+abstract public class Player implements Runnable, Serializable, PlayerInterface {
+//	private class StopTask extends TimerTask
+//	{
+//		private Player originator;
+//		private long id;
+//		
+//		public StopTask(Player iOrig)
+//		{
+//			originator = iOrig;
+//		}
+//		
+//		public void setId(long id)
+//		{
+//			this.id = id;
+//		}
+//		
+//		@Override
+//		public void run() {
+//			originator.handleRequestTimeOut(id);
+//		}
+//		
+//	}
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	public static final long kMaxDecisionTime = 10000;
+	private static final long kMaxTurnTime = 100000;
 	
 	private int victoryPoints;
+	private int prestigePoints;
 	private List<Card> hand;
 	private List<Card> board;
+	private Game game;
 	
-	private Request request;
-	private Reply reply;
+	private Phase currentPhase;
+	private Action actionChosen;
+	
 	private Thread playerThread;
-	private Timer timer;
-	private StopTask task;
+//	private Timer timer;
+//	private StopTask task;
+
 	private PlayerColor color;
 	private boolean simultaneous;
+	private boolean gameActive;
+	private long currentId, lastExecutedId;
+	private boolean prestigeActionUsed;
+	private boolean isPrestige;
 	
-	public Player(boolean iSimultaneous)
+	public Player(Game iGame, boolean iSimultaneous) throws TwoManyPlayersException
 	{
+		game = iGame;
+		iGame.addPlayer(this);
+		
 		hand = new ArrayList<Card>(12);
 		board = new ArrayList<Card>(14);
-		timer = new Timer();
-		task = new StopTask(this);
+		
+//		timer = new Timer();
+//		task = new StopTask(this);
 		playerThread = new Thread(this);
-		request = new Request();
-		reply = new Reply(request);
+		
 		simultaneous = iSimultaneous;
+		gameActive = true;
+		
+		currentId = 0;
+		lastExecutedId = 0;
 	}
 	
-	public void addVp(int iNumber) {
-		victoryPoints += iNumber;
-	}
-
-	synchronized public void submitRequest(Request iRequest)
+	synchronized public void initPhase( Phase iPhase)
 	{
-		request = iRequest;
-		reply = new Reply(request);
-		reply.setProcessingDone(false);
+		// Start thread if not running
+		if(!playerThread.isAlive())
+			playerThread.start();
+		
+		currentPhase = iPhase;
+		
+		switch(currentPhase)
+		{
+		case selectAction:
+			initSelectAction();
+			break;
+		case search:
+			initSearch();
+			break;
+		case explore:
+			initExplore();
+			break;
+		case develop:
+			initDevelop();
+			break;
+		case settle:
+			initSettle();
+			break;
+		case consume:
+			initConsume();
+			break;
+		case produce:
+			initProduce();
+			break;
+		default:
+			break; // ???
+		}
+
+		currentId++;
+		
+		// Start user interactions, notify thread
+		notify();
+		
 		if(simultaneous)
 		{
-			playerThread.start();
-			timer.schedule(task, kMaxDecisionTime);
-		}
-		else
-		{
-			playerThread.start();
 			try {
-				wait(kMaxDecisionTime);
+				wait(kMaxTurnTime);
 			} catch (InterruptedException e) {
-				// Too bad... Default reply!
+				// ok
+				e.printStackTrace();
 			}
-			if(!reply.isProcessingDone())
-				setDefaultReply();
 		}
 	}
-	synchronized protected void handleRequestTimeOut() {
-		timer.cancel();
-		if(!reply.isProcessingDone())
-			setDefaultReply();
-		notifyAll();
-	}
-
-	protected abstract void submitRequestImpl( Request iRequest);
 	
-
-	public void run() {
-		submitRequestImpl( request);
-
-		notifyAll();
-	}
-	
-	synchronized private void setDefaultReply() {
-		if(!reply.isProcessingDone())
+	synchronized private void executePhase()
+	{
+		if(currentId <= lastExecutedId)
+			return;
+		lastExecutedId++;
+		
+		switch(currentPhase)
 		{
-			reply.setProcessingDone(true);
-			reply.setReplyText("default");
-			notifyDefaultReply(reply);
+		case selectAction:
+			executeSelectAction();
+			break;
+		case search:
+			executeSearch();
+			break;
+		case explore:
+			executeExplore();
+			break;
+		case develop:
+			executeDevelop();
+			break;
+		case settle:
+			executeSettle();
+			break;
+		case consume:
+			executeConsume();
+			break;
+		case produce:
+			executeProduce();
+			break;
+		default:
+			break; // ???
 		}
+		
+		notify();
 	}
-	abstract public void notifyDefaultReply(Reply iRep);
-
-	synchronized public void setReply(Reply iReply) {
-		if(!reply.isProcessingDone())
+	
+	synchronized public void terminatePhase( )
+	{
+		if(!simultaneous)
 		{
-			reply = iReply;
+			try {
+				wait(kMaxTurnTime);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		switch(currentPhase)
+		{
+		case selectAction:
+			terminateSelectAction();
+			break;
+		case search:
+			terminateSearch();
+			break;
+		case explore:
+			terminateExplore();
+			break;
+		case develop:
+			terminateDevelop();
+			break;
+		case settle:
+			terminateSettle();
+			break;
+		case consume:
+			terminateConsume();
+			break;
+		case produce:
+			terminateProduce();
+			break;
+		default:
+			break; // ???
 		}
 	}
 	
-	public Reply getReply() {
-		return reply;
+	private void initProduce() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void initConsume() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void initSettle() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void initDevelop() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void initExplore() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void initSearch() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void initSelectAction() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void executeProduce() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void executeConsume() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void executeSettle() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void executeDevelop() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void executeExplore() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void executeSearch() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void executeSelectAction() {
+		actionChosen = selectAction(prestigeActionUsed);
+		prestigeActionUsed = prestigeActionUsed || isPrestige;
+	}
+	
+	private void terminateProduce() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void terminateConsume() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void terminateSettle() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void terminateDevelop() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void terminateExplore() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void terminateSearch() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void terminateSelectAction() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	synchronized public void run() {
+		while(gameActive)
+		{
+			executePhase();
+			try {
+				wait(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
 	}
 	
 	@Override
@@ -130,15 +337,11 @@ abstract public class Player implements Runnable, Serializable {
 		_builder.append("]");
 		return _builder.toString();
 	}
-
-	synchronized public void waitResponse() {
-		try {
-			wait(100);
-		} catch (InterruptedException e) {
-			// Got interrupted... ignore
-		}
+	
+	public void addVp(int iNumber) {
+		victoryPoints += iNumber;
 	}
-
+	
 	public PlayerColor getColor() {
 		return color;
 	}
@@ -171,6 +374,58 @@ abstract public class Player implements Runnable, Serializable {
 
 	protected boolean isSimultaneous() {
 		return simultaneous;
+	}
+
+	public Game getGame() {
+		return game;
+	}
+
+	public void setGame(Game game) {
+		this.game = game;
+	}
+
+	public Phase getCurrentPhase() {
+		return currentPhase;
+	}
+
+	public void setCurrentPhase(Phase currentPhase) {
+		this.currentPhase = currentPhase;
+	}
+
+	public Action getActionChosen() {
+		return actionChosen;
+	}
+
+	public void setActionChosen(Action actionChosen) {
+		this.actionChosen = actionChosen;
+	}
+
+	public boolean isGameActive() {
+		return gameActive;
+	}
+
+	public void setGameActive(boolean gameActive) {
+		this.gameActive = gameActive;
+	}
+
+	public void setHand(List<Card> hand) {
+		this.hand = hand;
+	}
+
+	public boolean isPrestige() {
+		return isPrestige;
+	}
+
+	public void setPrestige(boolean isPrestige) {
+		this.isPrestige = isPrestige && !prestigeActionUsed;
+	}
+
+	public int getPrestigePoints() {
+		return prestigePoints;
+	}
+
+	public void setPrestigePoints(int prestigePoints) {
+		this.prestigePoints = prestigePoints;
 	}
 
 }

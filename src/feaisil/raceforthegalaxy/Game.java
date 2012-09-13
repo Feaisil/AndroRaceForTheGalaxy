@@ -8,6 +8,7 @@ import java.util.Random;
 
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Goal;
+import feaisil.raceforthegalaxy.common.Phase;
 import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.common.Request;
 import feaisil.raceforthegalaxy.exception.*;
@@ -166,26 +167,26 @@ public final class Game implements Serializable, Runnable{
 		// TODO Auto-generated method stub
 		// TODO Remove this fake
 		
-		for (Player aP : players)
-		{
-			Request aReq = new Request();
-			aReq.setQueryText("Hello: ");
-			aP.submitRequest(aReq);
+		while(true){
+			for (Player aP : players)
+			{
+				aP.initPhase(Phase.selectAction);
+			}
+	
+			for (Player aP : players)
+			{
+				aP.terminatePhase();
+			}
+			
+			System.out.println();
+			for (Player aP : players)
+			{
+				System.out.println("--------");
+				System.out.println(aP);
+				System.out.println(aP.getActionChosen());
+			}
+		
 		}
-
-		for (Player aP : players)
-		{
-			while(!aP.getReply().isProcessingDone())
-				aP.waitResponse();
-		}
-		System.out.println();
-		for (Player aP : players)
-		{
-			System.out.println("--------");
-			System.out.println(aP);
-			System.out.println(aP.getReply());
-		}
-		System.out.println();
 	}
 
 	public void run() {

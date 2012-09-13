@@ -1,5 +1,6 @@
 <resources>
 
-    <style name="RaceForTheGalaxy" parent="android:Theme.Black" />
+    <style name="RaceForTheGalaxy" parent="android:Theme.Black" >
+    </style>
 
 </resources>
