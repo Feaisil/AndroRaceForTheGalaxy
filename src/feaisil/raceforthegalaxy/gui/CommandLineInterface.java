@@ -8,6 +8,7 @@ import java.util.List;
 
 import feaisil.raceforthegalaxy.Player;
 import feaisil.raceforthegalaxy.card.Card;
+import feaisil.raceforthegalaxy.common.Action;
 import feaisil.raceforthegalaxy.common.Request;
 
 public class CommandLineInterface implements UserInterface {
@@ -53,6 +54,16 @@ public class CommandLineInterface implements UserInterface {
 
 	public void responseTimeOut() {
 		System.out.println("Time out! Defaulting! Choose faster next time!");
+		
+	}
+
+	public Action selectAction(boolean prestigeActionUsed) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void switchToPlayer(Player player) {
+		// TODO Auto-generated method stub
 		
 	}
 }

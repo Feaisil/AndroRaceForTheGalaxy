@@ -6,7 +6,7 @@ import java.util.List;
 import feaisil.raceforthegalaxy.power.Power;
 import feaisil.raceforthegalaxy.victorypointbonus.VictoryPointBonus;
 
-public abstract class Card {
+public class Card {
 	private String name;
 	private int cost;
 	private int victoryPoints;

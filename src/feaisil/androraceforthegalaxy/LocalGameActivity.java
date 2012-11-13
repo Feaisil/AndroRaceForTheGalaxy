@@ -10,6 +10,7 @@ import feaisil.raceforthegalaxy.PlayerInterface;
 import feaisil.raceforthegalaxy.card.BaseCardList;
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.card.CardList;
+import feaisil.raceforthegalaxy.common.Action;
 import feaisil.raceforthegalaxy.common.Request;
 import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
@@ -28,12 +29,12 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 
-public class LocalGameActivity extends Activity implements UserInterface {
-
+public class LocalGameActivity extends Activity  implements UserInterface{
+	
 	private Game game;
-	private PlayerInterface currentPlayer;
 	
 	private LocalGameActivity current = this;
 	
@@ -47,9 +48,16 @@ public class LocalGameActivity extends Activity implements UserInterface {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_game);
         
-        cardImages = new ArrayList<SelectableCard>(12);
-        
-        initGame();
+        try {
+        	if(game == null)
+        	{
+                cardImages = new ArrayList<SelectableCard>(12);
+        		initGame();
+        	}
+		} catch (TwoManyPlayersException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 	@Override
@@ -70,11 +78,11 @@ public class LocalGameActivity extends Activity implements UserInterface {
     }
 
 
-    private void initGame() {
+    private void initGame() throws TwoManyPlayersException {
     	game = new Game();
     	
-		LocalPlayer aPl2 = new LocalPlayer(this);
-		LocalPlayer aPl3 = new LocalPlayer(this);
+		LocalPlayer aPl2 = new LocalPlayer(this, game);
+		LocalPlayer aPl3 = new LocalPlayer(this, game);
 		
 		CardList aCl = new BaseCardList();
 		
@@ -84,123 +92,12 @@ public class LocalGameActivity extends Activity implements UserInterface {
 			aPl2.addToHand(aCard);
 		for(Card aCard: aCl.getStartingRedWorlds())
 			aPl3.addToHand(aCard);
-
-		try {
-			game.addPlayer(aPl2);
-			game.addPlayer(aPl3);
-		} catch (TwoManyPlayersException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 				
 		game.init();
 		
-		showQueryDetailsHandler = new Handler()
-		{
-			public void handleMessage(Message msg) {
-				TextView aPlayerText = (TextView) findViewById(R.id.PlayerName);
-				aPlayerText.setText((String)msg.obj);
-				aPlayerText.setTextColor(msg.arg1);
-	        }
-		};
-		displayCardToChooseHandler = new Handler()
-		{
-			public void handleMessage(Message msg) {
-				LinearLayout aLayout = (LinearLayout)findViewById(R.id.choosecardlistlayout);
-				
-				aLayout.removeAllViewsInLayout();
-				
-				cardImages = new ArrayList<SelectableCard>( ((List<Card>)msg.obj).size());
-				for(Card aCard : (List<Card>)msg.obj)
-				{
-					SelectableCard aImg = new SelectableCard(current, aCard);
-					
-					cardImages.add(aImg);
-					aLayout.addView(aImg);
-				}
-				
-				findViewById(R.id.button1).setEnabled(false);
-	        }
-		};
 		new Thread(game).start();
-	}
+    }
 
-    public void showQueryDetails(Player iPlayer, Request iRequest) {
-		TextView aPlayerText = (TextView)this.findViewById(R.id.PlayerName);
-
-		Message msg = new Message();
-		switch(iPlayer.getColor())
-		{
-		case Red:
-			msg.obj = (String)"Red";
-			msg.arg1 = android.graphics.Color.RED;
-			break;
-		case Blue:
-			msg.obj = (String)("Blue");
-			msg.arg1 = (android.graphics.Color.BLUE);
-			break;
-		case Yellow:
-			msg.obj = (String)("Yellow");
-			msg.arg1 = (android.graphics.Color.YELLOW);
-			break;
-		case Green:
-			msg.obj = (String)("Green");
-			msg.arg1 = (android.graphics.Color.GREEN);
-			break;
-		case Pink:
-			msg.obj = (String)("Pink");
-			msg.arg1 = (android.graphics.Color.argb(0, 255, 100, 100));
-			break;
-		case LightBlue:
-			msg.obj = (String)("LightBlue");
-			msg.arg1 = (android.graphics.Color.argb(0, 100, 100, 255));
-			break;
-		}
-		showQueryDetailsHandler.sendMessage(msg);
-	}
-
-	public void displayCardToChoose(List<Card> iCards, int iN, ChooseAction iAction) {
-		numberOfCardsToChoose = iN;
-		numberOfCardsChosen = 0;
-		
-		Message msg = new Message();
-		msg.obj = iCards;
-		displayCardToChooseHandler.sendMessage(msg);
-		
-	}
-
-	synchronized public List<Card> getChoosenCards() {
-		try {
-			wait();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		List<Card> aResult = new ArrayList<Card>(numberOfCardsChosen);
-		for(SelectableCard aCard: cardImages)
-		{
-			if(aCard.isSelected())
-			{
-				System.err.println(""+ aCard.getCard());
-				aResult.add(aCard.getCard());
-			}
-			else
-				System.err.println(""+ aCard.getCard());
-		}
-		System.err.println("Cards: "+aResult);
-		return aResult;
-	}
-	
-	synchronized public void responseTimeOut()
-	{
-		LinearLayout aLayout = (LinearLayout)findViewById(R.id.choosecardlistlayout);
-		
-		aLayout.removeAllViewsInLayout();
-		
-		notifyAll();
-	}
-	
 	public void cardSelected(boolean selected) {
 		if(selected)
 			numberOfCardsChosen++;
@@ -208,14 +105,96 @@ public class LocalGameActivity extends Activity implements UserInterface {
 			numberOfCardsChosen--;
 		this.findViewById(R.id.button1).setEnabled(numberOfCardsChosen == numberOfCardsToChoose);
 	}
+
+	synchronized public Action selectAction(boolean prestigeActionUsed) {
+		numberOfCardsToChoose = 1;
+		numberOfCardsChosen = 0;
+		// TODO Create true action card list
+		List<Card> cards = new ArrayList<Card>();
+		
+		cards.add(new Card("Draw explore", 0, 0));
+		cards.add(new Card("Keep explore", 0, 0));
+		cards.add(new Card("Develop", 0, 0));
+		cards.add(new Card("Settle", 0, 0));
+		cards.add(new Card("Consume trade", 0, 0));
+		cards.add(new Card("Consume 2x VPs", 0, 0));
+		cards.add(new Card("Produce", 0, 0));
+		cards.add(new Card("Prestige/Search", 0, 0));
+
+		final List<Card> finalCards = cards;
+		
+    	displayCardChooser(finalCards);
+		
+		try {
+			// Todo register begin time and verify that action was completed
+			wait(game.getMaxDecisionTime());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
-	synchronized public void onCardChoosed(View aView)
+	public void displayCardChooser(final List<Card> iCards)
 	{
-		LinearLayout aLayout = (LinearLayout)findViewById(R.id.choosecardlistlayout);
-		
-		aLayout.removeAllViewsInLayout();
-		
-		notifyAll();
+		runOnUiThread(new Runnable() {
+            public void run() {
+				LinearLayout aLayout = (LinearLayout)findViewById(R.id.choosecardlistlayout);
+	
+				aLayout.removeAllViewsInLayout();
+	
+				cardImages = new ArrayList<SelectableCard>( iCards.size());
+				for(Card aCard : iCards)
+				{
+					SelectableCard aImg = new SelectableCard(current, aCard);
+	
+					cardImages.add(aImg);
+					aLayout.addView(aImg);
+				}
+	
+				findViewById(R.id.button1).setEnabled(false);
+            }
+		});
+	}
+	
+	public void responseTimeOut() {
+		runOnUiThread(new Runnable() {
+            public void run() {
+              Toast.makeText(LocalGameActivity.this, "You reached the response timeout, default action will be used!", Toast.LENGTH_SHORT).show();
+            }
+		});
 	}
 
+	int getPlayerColorConverted(final Player iPlayer)
+	{
+		switch(iPlayer.getColor())
+		{
+		case Red:
+			return android.graphics.Color.RED;
+		case Blue:
+			return (android.graphics.Color.BLUE);
+		case Yellow:
+			return (android.graphics.Color.YELLOW);
+		case Green:
+			return (android.graphics.Color.GREEN);
+		case Pink:
+			return (android.graphics.Color.argb(0, 255, 100, 100));
+		case LightBlue:
+			return (android.graphics.Color.argb(0, 100, 100, 255));
+		default:
+			return 0;
+		}
+	}
+	
+	public void switchToPlayer(final Player player) {
+		runOnUiThread(new Runnable() {
+            public void run() {
+				Toast.makeText(LocalGameActivity.this, "Changed to player "+player.getColor(), Toast.LENGTH_SHORT).show();
+				              
+				TextView aPlayerText = (TextView) findViewById(R.id.PlayerName);
+				aPlayerText.setText(player.getColor().toString());
+				aPlayerText.setTextColor(getPlayerColorConverted(player));
+            }
+		});
+	}
 }

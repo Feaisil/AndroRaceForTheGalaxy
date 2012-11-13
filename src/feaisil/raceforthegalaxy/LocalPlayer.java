@@ -25,18 +25,10 @@ public final class LocalPlayer extends Player {
 	private static final long serialVersionUID = 1L;
 	private UserInterface ui;
 
-	public LocalPlayer(Game iGame, UserInterface iUi) throws TwoManyPlayersException {
-		super(iGame, false);
+	public LocalPlayer(UserInterface iUi, Game iGame) throws TwoManyPlayersException {
+		super(iUi, iGame, false);
 		ui = iUi;
 	}
-	
-	public Action selectAction(boolean prestigeActionUsed) {
-		// TODO query ui
-		//ui.getChoosenCards();
-		return Action.trade;
-	}
-	
-	
 	
 	@Override
 	public String toString() {

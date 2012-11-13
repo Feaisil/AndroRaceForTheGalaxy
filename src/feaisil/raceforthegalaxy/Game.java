@@ -18,15 +18,21 @@ public final class Game implements Serializable, Runnable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static final long kMaxDecisionTime = 10000;
+	private static final long kMaxTurnTime = 100000;
 	
-	// game properties
-	private int 		seed;
-	private Random		randGen;
+	// game real properties
 	private boolean 	advanced;
 	private Expansion   expansion;
 	private boolean 	goalsDisabled;
 	private boolean 	takeOverDisabled;
 	
+	// game settings
+	private int 		seed;
+	private Random		randGen;
+	private long 		maxDecisionTime = kMaxDecisionTime;
+	private long 		maxTurnTime = kMaxTurnTime;
+
 	// game entities
 	private List<Player> players;
 	
@@ -104,6 +110,22 @@ public final class Game implements Serializable, Runnable{
 		iPlayer.setColor(PlayerColor.values()[players.size()]);
 	}
 	
+	public long getMaxDecisionTime() {
+		return maxDecisionTime;
+	}
+
+	public void setMaxDecisionTime(long maxDecisionTime) {
+		this.maxDecisionTime = maxDecisionTime;
+	}
+
+	public long getMaxTurnTime() {
+		return maxTurnTime;
+	}
+
+	public void setMaxTurnTime(long maxTurnTime) {
+		this.maxTurnTime = maxTurnTime;
+	}
+	
 	@Override
 	public String toString() {
 		final int _maxLen = 10;
@@ -168,15 +190,7 @@ public final class Game implements Serializable, Runnable{
 		// TODO Remove this fake
 		
 		while(true){
-			for (Player aP : players)
-			{
-				aP.initPhase(Phase.selectAction);
-			}
-	
-			for (Player aP : players)
-			{
-				aP.terminatePhase();
-			}
+			runPhase(Phase.selectAction);
 			
 			System.out.println();
 			for (Player aP : players)
@@ -185,11 +199,35 @@ public final class Game implements Serializable, Runnable{
 				System.out.println(aP);
 				System.out.println(aP.getActionChosen());
 			}
+		}
+	}
+
+	synchronized private void runPhase(Phase selectaction) {
+		for (Player aP : players)
+		{
+			aP.initPhase(Phase.selectAction);
+		}
 		
+		try {
+			for(Player ap : players)
+			{
+				if(ap.isActionExecuted())
+					continue;
+				ap.wait(250);
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for (Player aP : players)
+		{
+			aP.terminatePhase();
 		}
 	}
 
 	public void run() {
 		startGame();
 	}
+
 }

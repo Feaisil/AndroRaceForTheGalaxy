@@ -12,10 +12,11 @@ public class Main {
 	 */
 	public static void main(String[] args) throws Exception{
 		CommandLineInterface cli = new CommandLineInterface();
+
+		Game aGame = new Game();
 		
-		AIPlayer aPl1 = new AIPlayer();		
-		LocalPlayer aPl2 = new LocalPlayer(cli);
-		LocalPlayer aPl3 = new LocalPlayer(cli);
+		LocalPlayer aPl2 = new LocalPlayer(cli, aGame);
+		LocalPlayer aPl3 = new LocalPlayer(cli, aGame);
 		
 		CardList aCl = new BaseCardList();
 		
@@ -25,14 +26,6 @@ public class Main {
 			aPl2.addToHand(aCard);
 		for(Card aCard: aCl.getStartingRedWorlds())
 			aPl3.addToHand(aCard);
-		
-		Game aGame = new Game();
-		
-		aGame.addPlayer(aPl1);
-		aGame.addPlayer(aPl2);
-		aGame.addPlayer(aPl3);
-//		aGame.addPlayer(aPl4);
-//		aGame.addPlayer(aPl5);
 		
 		aGame.init();
 		aGame.startGame();

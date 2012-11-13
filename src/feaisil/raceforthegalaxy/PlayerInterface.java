@@ -4,6 +4,10 @@ import feaisil.raceforthegalaxy.common.Action;
 
 public interface PlayerInterface {
 
-	abstract public Action selectAction(boolean prestigeActionUsed);
+	public abstract Action selectAction(boolean prestigeActionUsed);
+	
+	public abstract void responseTimeOut();
+
+	public abstract void switchToPlayer(final Player player);
 
 }

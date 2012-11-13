@@ -16,81 +16,57 @@ import feaisil.raceforthegalaxy.common.Reply;
 import feaisil.raceforthegalaxy.common.Request;
 import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
 
-abstract public class Player implements Runnable, Serializable, PlayerInterface {
-//	private class StopTask extends TimerTask
-//	{
-//		private Player originator;
-//		private long id;
-//		
-//		public StopTask(Player iOrig)
-//		{
-//			originator = iOrig;
-//		}
-//		
-//		public void setId(long id)
-//		{
-//			this.id = id;
-//		}
-//		
-//		@Override
-//		public void run() {
-//			originator.handleRequestTimeOut(id);
-//		}
-//		
-//	}
+abstract public class Player implements Runnable, Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public static final long kMaxDecisionTime = 10000;
-	private static final long kMaxTurnTime = 100000;
+	
+	private Thread playerThread;
+
+	private Game game;
+	private PlayerInterface playerInterface;
+	private boolean isActionExecuted;
 	
 	private int victoryPoints;
 	private int prestigePoints;
 	private List<Card> hand;
 	private List<Card> board;
-	private Game game;
 	
 	private Phase currentPhase;
 	private Action actionChosen;
-	
-	private Thread playerThread;
-//	private Timer timer;
-//	private StopTask task;
 
 	private PlayerColor color;
 	private boolean simultaneous;
 	private boolean gameActive;
-	private long currentId, lastExecutedId;
 	private boolean prestigeActionUsed;
 	private boolean isPrestige;
 	
-	public Player(Game iGame, boolean iSimultaneous) throws TwoManyPlayersException
+	public Player(PlayerInterface iPlayerInterface, Game iGame, boolean iSimultaneous) throws TwoManyPlayersException
 	{
+		playerInterface = iPlayerInterface;
 		game = iGame;
 		iGame.addPlayer(this);
 		
 		hand = new ArrayList<Card>(12);
 		board = new ArrayList<Card>(14);
 		
-//		timer = new Timer();
-//		task = new StopTask(this);
-		playerThread = new Thread(this);
+		if(simultaneous)
+			playerThread = new Thread(this);
 		
 		simultaneous = iSimultaneous;
 		gameActive = true;
-		
-		currentId = 0;
-		lastExecutedId = 0;
 	}
 	
-	synchronized public void initPhase( Phase iPhase)
+	public void initPhase( Phase iPhase)
 	{
-		// Start thread if not running
-		if(!playerThread.isAlive())
-			playerThread.start();
+		// Start thread if not running and simultaneous mode
+		if(simultaneous)
+			if(!playerThread.isAlive())
+				playerThread.start();
 		
 		currentPhase = iPhase;
+		isActionExecuted = false;
 		
 		switch(currentPhase)
 		{
@@ -119,27 +95,22 @@ abstract public class Player implements Runnable, Serializable, PlayerInterface 
 			break; // ???
 		}
 
-		currentId++;
-		
-		// Start user interactions, notify thread
-		notify();
-		
-		if(simultaneous)
+		// Start user interactions in executePhase
+		if(!simultaneous)
 		{
-			try {
-				wait(kMaxTurnTime);
-			} catch (InterruptedException e) {
-				// ok
-				e.printStackTrace();
-			}
+			playerInterface.switchToPlayer(this);
+			executePhase();
+		}
+		else
+		{
+			notify();
 		}
 	}
 	
-	synchronized private void executePhase()
+	private void executePhase()
 	{
-		if(currentId <= lastExecutedId)
+		if(isActionExecuted)
 			return;
-		lastExecutedId++;
 		
 		switch(currentPhase)
 		{
@@ -168,21 +139,13 @@ abstract public class Player implements Runnable, Serializable, PlayerInterface 
 			break; // ???
 		}
 		
-		notify();
+		isActionExecuted = true;
+		if(simultaneous)
+			notify();
 	}
-	
+
 	synchronized public void terminatePhase( )
 	{
-		if(!simultaneous)
-		{
-			try {
-				wait(kMaxTurnTime);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
 		switch(currentPhase)
 		{
 		case selectAction:
@@ -277,7 +240,7 @@ abstract public class Player implements Runnable, Serializable, PlayerInterface 
 	}
 
 	private void executeSelectAction() {
-		actionChosen = selectAction(prestigeActionUsed);
+		actionChosen = playerInterface.selectAction(prestigeActionUsed);
 		prestigeActionUsed = prestigeActionUsed || isPrestige;
 	}
 	
@@ -428,4 +391,7 @@ abstract public class Player implements Runnable, Serializable, PlayerInterface 
 		this.prestigePoints = prestigePoints;
 	}
 
+	public boolean isActionExecuted() {
+		return isActionExecuted;
+	}
 }

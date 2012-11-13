@@ -12,8 +12,8 @@ public final class AIPlayer extends Player {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public AIPlayer(Game iGame) throws TwoManyPlayersException {
-		super(iGame, false);
+	public AIPlayer(PlayerInterface pi, Game iGame) throws TwoManyPlayersException {
+		super(pi, iGame, false);
 	}
 	
 	@Override
