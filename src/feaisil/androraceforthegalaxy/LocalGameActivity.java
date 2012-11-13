@@ -197,4 +197,13 @@ public class LocalGameActivity extends Activity  implements UserInterface{
             }
 		});
 	}
+	
+	synchronized public void onCardChoosed(View aView)
+	{
+		LinearLayout aLayout = (LinearLayout)findViewById(R.id.choosecardlistlayout);
+
+		aLayout.removeAllViewsInLayout();
+
+		notifyAll();
+	}
 }
