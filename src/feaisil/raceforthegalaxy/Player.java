@@ -38,7 +38,6 @@ abstract public class Player implements Runnable, Serializable {
 
 	private PlayerColor color;
 	private boolean simultaneous;
-	private boolean gameActive;
 	private boolean prestigeActionUsed;
 	private boolean isPrestige;
 	
@@ -55,7 +54,6 @@ abstract public class Player implements Runnable, Serializable {
 			playerThread = new Thread(this);
 		
 		simultaneous = iSimultaneous;
-		gameActive = true;
 	}
 	
 	public void initPhase( Phase iPhase)
@@ -280,7 +278,7 @@ abstract public class Player implements Runnable, Serializable {
 	}
 
 	synchronized public void run() {
-		while(gameActive)
+		while(game.isGameActive())
 		{
 			executePhase();
 			try {
@@ -361,14 +359,6 @@ abstract public class Player implements Runnable, Serializable {
 
 	public void setActionChosen(Action actionChosen) {
 		this.actionChosen = actionChosen;
-	}
-
-	public boolean isGameActive() {
-		return gameActive;
-	}
-
-	public void setGameActive(boolean gameActive) {
-		this.gameActive = gameActive;
 	}
 
 	public void setHand(List<Card> hand) {

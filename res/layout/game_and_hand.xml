@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ViewFlipper
+        android:id="@+id/boardhandflipper"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="60" >
+
+        <GridView
+            android:id="@+id/gameBoard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:numColumns="7" >
+        </GridView>
+
+        <GridView
+            android:id="@+id/playerHand"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:numColumns="6" >
+        </GridView>
+    </ViewFlipper>
+
+    <ImageButton
+        android:id="@+id/imageButton1"
+        android:layout_width="99dp"
+        android:layout_height="100dp"
+        android:layout_weight="40"
+        android:contentDescription="@string/display_hand"
+        android:src="@drawable/rftg_icon_11" />
+
+</LinearLayout>

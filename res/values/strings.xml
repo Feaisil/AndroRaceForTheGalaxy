@@ -8,5 +8,5 @@
     <string name="startgame">Start game</string>
     <string name="title_activity_game">GameActivity</string>
     <string name="title_activity_local_game">LocalGameActivity</string>
-
+	<string name="display_hand">Display hand</string>
 </resources>

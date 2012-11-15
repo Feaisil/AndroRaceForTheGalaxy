@@ -10,7 +10,6 @@ import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Goal;
 import feaisil.raceforthegalaxy.common.Phase;
 import feaisil.raceforthegalaxy.common.PlayerColor;
-import feaisil.raceforthegalaxy.common.Request;
 import feaisil.raceforthegalaxy.exception.*;
 
 public final class Game implements Serializable, Runnable{
@@ -20,6 +19,9 @@ public final class Game implements Serializable, Runnable{
 	private static final long serialVersionUID = 1L;
 	private static final long kMaxDecisionTime = 10000;
 	private static final long kMaxTurnTime = 100000;
+
+	private static Game currentInstance;
+	private boolean gameActive;
 	
 	// game real properties
 	private boolean 	advanced;
@@ -126,6 +128,22 @@ public final class Game implements Serializable, Runnable{
 		this.maxTurnTime = maxTurnTime;
 	}
 	
+	public boolean isGameActive() {
+		return gameActive;
+	}
+
+	public void setGameActive(boolean gameActive) {
+		this.gameActive = gameActive;
+	}
+
+	public static Game getCurrentInstance() {
+		return currentInstance;
+	}
+
+	public static void setCurrentInstance(Game currentInstance) {
+		Game.currentInstance = currentInstance;
+	}
+
 	@Override
 	public String toString() {
 		final int _maxLen = 10;
@@ -186,10 +204,8 @@ public final class Game implements Serializable, Runnable{
 	}
 
 	public void startGame() {
-		// TODO Auto-generated method stub
-		// TODO Remove this fake
 		
-		while(true){
+		while(isGameActive()){
 			runPhase(Phase.selectAction);
 			
 			System.out.println();
@@ -227,7 +243,12 @@ public final class Game implements Serializable, Runnable{
 	}
 
 	public void run() {
+		// If game active, don't run
+		if(isGameActive())
+			return;
+		setGameActive(true);
 		startGame();
+		setGameActive(false);
 	}
 
 }

@@ -16,6 +16,7 @@ import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
 import feaisil.raceforthegalaxy.gui.ChooseAction;
 import feaisil.raceforthegalaxy.gui.UserInterface;
+import feaisil.raceforthegalaxy.guielements.CardAdapter;
 import feaisil.raceforthegalaxy.guielements.SelectableCard;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +29,8 @@ import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.app.NavUtils;
@@ -42,6 +45,8 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 	private int numberOfCardsToChoose;
 	private int numberOfCardsChosen;
 	private List<SelectableCard> cardImages;
+
+    GridView vue;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,6 +99,10 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 			aPl3.addToHand(aCard);
 				
 		game.init();
+		
+		vue = (GridView) findViewById(R.id.handlist);
+		ListAdapter adapter = new CardAdapter(aPl2.getHand(), getLayoutInflater());
+		vue.setAdapter(adapter);
 		
 		new Thread(game).start();
     }
