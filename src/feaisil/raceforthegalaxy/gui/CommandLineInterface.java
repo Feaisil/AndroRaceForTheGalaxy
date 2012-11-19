@@ -9,21 +9,12 @@ import java.util.List;
 import feaisil.raceforthegalaxy.Player;
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Action;
-import feaisil.raceforthegalaxy.common.Request;
 
 public class CommandLineInterface implements UserInterface {
 	private List<Card> cards;
 	/* (non-Javadoc)
 	 * @see feaisil.raceforthegalaxy.gui.UserInterface#showQueryDetails(feaisil.raceforthegalaxy.Player, feaisil.raceforthegalaxy.common.Request)
 	 */
-	public void showQueryDetails(Player iPlayer, Request iRequest)
-	{
-		System.out.print("\n\n\n\n\n\n\n\n\n\n\n");
-		System.out.println("**************************************");
-		System.out.println(" Player "+iPlayer.getColor());
-		System.out.println(" Action "+iRequest.getQueryText());
-	}
-
 	public void displayCardToChoose(List<Card> iCards, int iNumber,
 			ChooseAction iAction) {
 		cards = iCards;
@@ -65,5 +56,10 @@ public class CommandLineInterface implements UserInterface {
 	public void switchToPlayer(Player player) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Card chooseCardToDiscard(List<Card> cards) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

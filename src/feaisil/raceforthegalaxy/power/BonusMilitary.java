@@ -15,8 +15,6 @@ public final class BonusMilitary extends Power {
 		
 		type = iType;
 		strength = iStrength;
-		
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

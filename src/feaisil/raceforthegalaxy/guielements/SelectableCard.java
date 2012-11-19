@@ -1,13 +1,17 @@
 package feaisil.raceforthegalaxy.guielements;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Scanner;
 
 import feaisil.androraceforthegalaxy.LocalGameActivity;
 import feaisil.androraceforthegalaxy.R;
 import feaisil.raceforthegalaxy.card.Card;
 import android.R.color;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageButton;
@@ -42,15 +46,29 @@ public class SelectableCard extends ImageButton {
 			idDefinitions.put("Prestige/Search", R.drawable.rftg_action_10);
 			
 			// back
-			idDefinitions.put("Back", R.drawable.rftg_back);			
-			
-			// playable cards
-			idDefinitions.put("Old Earth", R.drawable.rftg_card_000);
-			idDefinitions.put("Epsilon Eridani", R.drawable.rftg_card_001);
-			idDefinitions.put("Alpha Centauri", R.drawable.rftg_card_002);
-			idDefinitions.put("New Sparta", R.drawable.rftg_card_003);
-			idDefinitions.put("Earth's Lost Colony", R.drawable.rftg_card_004);
-			
+			idDefinitions.put("Back", R.drawable.rftg_back);
+
+			Scanner scanner;
+			scanner = new Scanner(Resources.getSystem().openRawResource(R.raw.rftg_card_reference));
+		    try {
+		      while ( scanner.hasNextLine() ){
+		    	  String aLine = (scanner.nextLine());
+		    	  String aId = aLine.split(";")[1];
+		    	  idDefinitions.put(aId, R.drawable.class.getField(aId).getInt(null));
+		      }
+		    } catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    finally {
+		    	scanner.close();
+		    }
 			
 		}
 	}
@@ -63,7 +81,7 @@ public class SelectableCard extends ImageButton {
 		if(idDefinitions == null)
 			initIdDefinitions();
 		
-		id = idDefinitions.get(iCard.getName());
+		id = idDefinitions.get(iCard.getGraphicId());
 		setImageResource(id);
 		setOnClickListener(new OnClickListener()
 			{

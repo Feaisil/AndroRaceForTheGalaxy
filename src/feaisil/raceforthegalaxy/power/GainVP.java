@@ -4,6 +4,7 @@ import feaisil.raceforthegalaxy.Game;
 import feaisil.raceforthegalaxy.Player;
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Phase;
+import feaisil.raceforthegalaxy.exception.InactiveGameException;
 import feaisil.raceforthegalaxy.exception.PlayerNotInGameException;
 
 public final class GainVP extends Power {
@@ -31,7 +32,7 @@ public final class GainVP extends Power {
 		return _builder.toString();
 	}
 	@Override
-	public void trigger(Game iGame, Player iPlayer, Card iCard) throws PlayerNotInGameException {
+	public void trigger(Game iGame, Player iPlayer, Card iCard) throws PlayerNotInGameException, InactiveGameException {
 		iGame.drawVP(iPlayer, number);
 	}
 

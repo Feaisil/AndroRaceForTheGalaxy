@@ -28,7 +28,7 @@ public class Main {
 			aPl3.addToHand(aCard);
 		
 		aGame.init();
-		aGame.startGame();
+		aGame.playGame();
 		
 		System.out.println(aGame);
 	}

@@ -7,8 +7,7 @@ import java.util.List;
 
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Action;
-import feaisil.raceforthegalaxy.common.Reply;
-import feaisil.raceforthegalaxy.common.Request;
+import feaisil.raceforthegalaxy.exception.ActiveGameException;
 import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
 import feaisil.raceforthegalaxy.gui.ChooseAction;
 import feaisil.raceforthegalaxy.gui.UserInterface;
@@ -25,7 +24,7 @@ public final class LocalPlayer extends Player {
 	private static final long serialVersionUID = 1L;
 	private UserInterface ui;
 
-	public LocalPlayer(UserInterface iUi, Game iGame) throws TwoManyPlayersException {
+	public LocalPlayer(UserInterface iUi, Game iGame) throws TwoManyPlayersException, ActiveGameException {
 		super(iUi, iGame, false);
 		ui = iUi;
 	}

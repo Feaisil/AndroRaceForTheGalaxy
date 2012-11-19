@@ -11,8 +11,8 @@ import feaisil.raceforthegalaxy.card.BaseCardList;
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.card.CardList;
 import feaisil.raceforthegalaxy.common.Action;
-import feaisil.raceforthegalaxy.common.Request;
 import feaisil.raceforthegalaxy.common.PlayerColor;
+import feaisil.raceforthegalaxy.exception.ActiveGameException;
 import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
 import feaisil.raceforthegalaxy.gui.ChooseAction;
 import feaisil.raceforthegalaxy.gui.UserInterface;
@@ -62,6 +62,9 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		} catch (TwoManyPlayersException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (ActiveGameException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
     }
 
@@ -83,12 +86,13 @@ public class LocalGameActivity extends Activity  implements UserInterface{
     }
 
 
-    private void initGame() throws TwoManyPlayersException {
+    private void initGame() throws TwoManyPlayersException, ActiveGameException {
     	game = new Game();
     	
 		LocalPlayer aPl2 = new LocalPlayer(this, game);
 		LocalPlayer aPl3 = new LocalPlayer(this, game);
-		
+		LocalPlayer aPl4 = new LocalPlayer(this, game);
+
 		CardList aCl = new BaseCardList();
 		
 		aCl.initCardList();
@@ -97,6 +101,8 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 			aPl2.addToHand(aCard);
 		for(Card aCard: aCl.getStartingRedWorlds())
 			aPl3.addToHand(aCard);
+		for(Card aCard: aCl.getDeck())
+			aPl4.addToHand(aCard);
 				
 		game.init();
 		
@@ -121,14 +127,14 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		// TODO Create true action card list
 		List<Card> cards = new ArrayList<Card>();
 		
-		cards.add(new Card("Draw explore", 0, 0));
-		cards.add(new Card("Keep explore", 0, 0));
-		cards.add(new Card("Develop", 0, 0));
-		cards.add(new Card("Settle", 0, 0));
-		cards.add(new Card("Consume trade", 0, 0));
-		cards.add(new Card("Consume 2x VPs", 0, 0));
-		cards.add(new Card("Produce", 0, 0));
-		cards.add(new Card("Prestige/Search", 0, 0));
+		cards.add(new Card("Draw explore", "Draw explore", 0, 0, prestigeActionUsed, null, null, null));
+		cards.add(new Card("Keep explore", "Keep explore", 0, 0, prestigeActionUsed, null, null, null));
+		cards.add(new Card("Develop", "Develop", 0, 0, prestigeActionUsed, null, null, null));
+//		cards.add(new Card("Settle", 0, 0));
+//		cards.add(new Card("Consume trade", 0, 0));
+//		cards.add(new Card("Consume 2x VPs", 0, 0));
+//		cards.add(new Card("Produce", 0, 0));
+//		cards.add(new Card("Prestige/Search", 0, 0));
 
 		final List<Card> finalCards = cards;
 		
@@ -141,7 +147,7 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return Action.exploreKeep;
 	}
 	
 	public void displayCardChooser(final List<Card> iCards)
@@ -214,5 +220,18 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		aLayout.removeAllViewsInLayout();
 
 		notifyAll();
+	}
+
+	synchronized public Card chooseCardToDiscard(List<Card> cards) {
+		displayCardChooser(cards);
+		
+		try {
+			// Todo register begin time and verify that action was completed
+			wait(game.getMaxDecisionTime());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

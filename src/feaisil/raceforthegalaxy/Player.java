@@ -12,8 +12,7 @@ import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Action;
 import feaisil.raceforthegalaxy.common.Phase;
 import feaisil.raceforthegalaxy.common.PlayerColor;
-import feaisil.raceforthegalaxy.common.Reply;
-import feaisil.raceforthegalaxy.common.Request;
+import feaisil.raceforthegalaxy.exception.ActiveGameException;
 import feaisil.raceforthegalaxy.exception.TwoManyPlayersException;
 
 abstract public class Player implements Runnable, Serializable {
@@ -41,7 +40,7 @@ abstract public class Player implements Runnable, Serializable {
 	private boolean prestigeActionUsed;
 	private boolean isPrestige;
 	
-	public Player(PlayerInterface iPlayerInterface, Game iGame, boolean iSimultaneous) throws TwoManyPlayersException
+	public Player(PlayerInterface iPlayerInterface, Game iGame, boolean iSimultaneous) throws TwoManyPlayersException, ActiveGameException
 	{
 		playerInterface = iPlayerInterface;
 		game = iGame;
@@ -228,6 +227,7 @@ abstract public class Player implements Runnable, Serializable {
 	}
 
 	private void executeExplore() {
+		Card aCard = playerInterface.chooseCardToDiscard(hand);
 		// TODO Auto-generated method stub
 		
 	}
@@ -383,5 +383,13 @@ abstract public class Player implements Runnable, Serializable {
 
 	public boolean isActionExecuted() {
 		return isActionExecuted;
+	}
+
+	protected boolean hasPower(String iPower) {
+		for(Card aC: board)
+		{
+			return aC.hasPower(iPower);
+		}
+		return false;
 	}
 }

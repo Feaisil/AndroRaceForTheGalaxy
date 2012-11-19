@@ -4,9 +4,10 @@ import feaisil.raceforthegalaxy.Game;
 import feaisil.raceforthegalaxy.Player;
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Phase;
+import feaisil.raceforthegalaxy.exception.InactiveGameException;
 import feaisil.raceforthegalaxy.exception.PlayerNotInGameException;
 
-public abstract class Power {
+public abstract class Power {	
 	private Phase phase;
 	
 	public Power(Phase iPhase)
@@ -19,8 +20,8 @@ public abstract class Power {
 		return phase;
 	}
 	
-	public abstract void trigger(Game iGame, Player iPlayer, Card iCard) throws PlayerNotInGameException;
-
+	public abstract void trigger(Game iGame, Player iPlayer, Card iCard) throws PlayerNotInGameException, InactiveGameException;
+	
 	@Override
 	public String toString() {
 		StringBuilder _builder = new StringBuilder();

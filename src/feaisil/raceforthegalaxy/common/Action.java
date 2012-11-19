@@ -8,5 +8,6 @@ public enum Action {
 	settle,
 	trade,
 	consume,
-	produce;
+	produce, 
+	none;
 }
