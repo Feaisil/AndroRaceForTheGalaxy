@@ -130,11 +130,6 @@ public abstract class CardList {
 		String[] values = nextLine.split(";");
 		for(int i=0; i<values.length; i++)
 			System.out.println(""+i+" : "+values[i]);
-		if(values.length != 31)
-		{
-			System.out.println(nextLine);
-			return;
-		}
 		if(values[0].equals("Name "))
 			return;
 		String name = values[0];
