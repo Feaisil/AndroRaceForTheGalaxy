@@ -104,7 +104,6 @@ public abstract class CardList {
 	    	  }
 	    	  catch(Exception e)
 	    	  {
-	    		  e.printStackTrace();
 	    	  }
 	      }
 	    }
@@ -127,13 +126,16 @@ public abstract class CardList {
 		return GoodType.None;
 	}
 	private void processLineFromCsv(String nextLine, Expansion iExp) {
+		System.out.println(nextLine);
 		String[] values = nextLine.split(";");
-		if(values.length == 31)
+		for(int i=0; i<values.length; i++)
+			System.out.println(""+i+" : "+values[i]);
+		if(values.length != 31)
 		{
 			System.out.println(nextLine);
 			return;
 		}
-		if(values[0].equals("Name"))
+		if(values[0].equals("Name "))
 			return;
 		String name = values[0];
 		String graphicId = values[1];
