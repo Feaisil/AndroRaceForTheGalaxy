@@ -94,9 +94,9 @@ public abstract class CardList {
 	}
 	
 
-	protected void initFromCsv( Expansion iExp) throws FileNotFoundException
+	protected void initFromCsv(Resources res, Expansion iExp) throws FileNotFoundException
 	{
-		Scanner scanner = new Scanner(Resources.getSystem().openRawResource(R.raw.rftg_card_reference));
+		Scanner scanner = new Scanner(res.openRawResource(R.raw.rftg_card_reference));
 	    try {
 	      while ( scanner.hasNextLine() ){
 	    	  processLineFromCsv( scanner.nextLine() , iExp);

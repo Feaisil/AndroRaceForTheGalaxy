@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import android.content.res.Resources;
+
 import feaisil.androraceforthegalaxy.R;
 import feaisil.raceforthegalaxy.Expansion;
 import feaisil.raceforthegalaxy.common.GoodType;
@@ -14,9 +16,10 @@ import feaisil.raceforthegalaxy.victorypointbonus.EndGameBonus;
 
 public class BaseCardList extends CardList {
 	@Override
-	public void initCardList() {
+	public void initCardList(){}
+	public void initCardList(Resources res) {
 		try {
-			initFromCsv(Expansion.BaseGame);
+			initFromCsv(res, Expansion.BaseGame);
 		} catch (FileNotFoundException e) {
 			System.out.println("Exception occured while retrieving cards");
 		}

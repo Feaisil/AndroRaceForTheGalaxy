@@ -93,9 +93,9 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		LocalPlayer aPl3 = new LocalPlayer(this, game);
 		LocalPlayer aPl4 = new LocalPlayer(this, game);
 
-		CardList aCl = new BaseCardList();
+		BaseCardList aCl = new BaseCardList();
 		
-		aCl.initCardList();
+		aCl.initCardList(this.getResources());
 		
 		for(Card aCard: aCl.getStartingBlueWorlds())
 			aPl2.addToHand(aCard);

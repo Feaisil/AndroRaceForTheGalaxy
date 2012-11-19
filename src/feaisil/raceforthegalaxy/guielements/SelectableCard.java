@@ -29,7 +29,7 @@ public class SelectableCard extends ImageButton {
 	private Integer id;
 	private static Map<String, Integer> idDefinitions;
 	
-	private void initIdDefinitions()
+	private void initIdDefinitions(Context context)
 	{
 		if(idDefinitions == null)
 		{
@@ -49,7 +49,7 @@ public class SelectableCard extends ImageButton {
 			idDefinitions.put("Back", R.drawable.rftg_back);
 
 			Scanner scanner;
-			scanner = new Scanner(Resources.getSystem().openRawResource(R.raw.rftg_card_reference));
+			scanner = new Scanner(context.getResources().openRawResource(R.raw.rftg_card_reference));
 		    try {
 		      while ( scanner.hasNextLine() ){
 		    	  String aLine = (scanner.nextLine());
@@ -79,7 +79,7 @@ public class SelectableCard extends ImageButton {
 		card = iCard;
 		
 		if(idDefinitions == null)
-			initIdDefinitions();
+			initIdDefinitions(context);
 		
 		id = idDefinitions.get(iCard.getGraphicId());
 		setImageResource(id);
