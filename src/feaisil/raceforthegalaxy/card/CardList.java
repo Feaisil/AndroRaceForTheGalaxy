@@ -99,7 +99,13 @@ public abstract class CardList {
 		Scanner scanner = new Scanner(res.openRawResource(R.raw.rftg_card_reference));
 	    try {
 	      while ( scanner.hasNextLine() ){
-	    	  processLineFromCsv( scanner.nextLine() , iExp);
+	    	  try{
+	    		  processLineFromCsv( scanner.nextLine() , iExp);
+	    	  }
+	    	  catch(Exception e)
+	    	  {
+	    		  e.printStackTrace();
+	    	  }
 	      }
 	    }
 	    finally {
