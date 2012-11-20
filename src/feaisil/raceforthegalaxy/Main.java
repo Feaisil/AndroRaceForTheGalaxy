@@ -20,7 +20,7 @@ public class Main {
 		
 		CardList aCl = new BaseCardList();
 		
-		aCl.initCardList();
+		//aCl.initCardList();
 		
 		for(Card aCard: aCl.getStartingBlueWorlds())
 			aPl2.addToHand(aCard);

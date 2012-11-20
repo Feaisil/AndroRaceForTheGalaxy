@@ -15,8 +15,6 @@ import feaisil.raceforthegalaxy.power.*;
 import feaisil.raceforthegalaxy.victorypointbonus.EndGameBonus;
 
 public class BaseCardList extends CardList {
-	@Override
-	public void initCardList(){}
 	public void initCardList(Resources res) {
 		try {
 			initFromCsv(res, Expansion.BaseGame);

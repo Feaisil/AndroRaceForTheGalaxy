@@ -17,7 +17,7 @@ public class World extends Card{
 				+ ", isPrestige()=" + isPrestige() + ", getGraphicId()="
 				+ getGraphicId() + ", toString()=" + super.toString()
 				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
-				+ "]";
+				+ "]\n";
 	}
 	
 	private Card good;

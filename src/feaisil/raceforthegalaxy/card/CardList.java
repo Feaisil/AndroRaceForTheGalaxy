@@ -15,7 +15,7 @@ import feaisil.raceforthegalaxy.power.BonusMilitary;
 import feaisil.raceforthegalaxy.power.Power;
 import feaisil.raceforthegalaxy.victorypointbonus.EndGameBonus;
 
-public abstract class CardList {
+public class CardList {
 	private List<Card> Deck;
 	private List<Card> StartingWorlds;
 	private List<Card> StartingBlueWorlds;
@@ -28,7 +28,6 @@ public abstract class CardList {
 		StartingBlueWorlds = new ArrayList<Card>(10);
 		StartingRedWorlds = new ArrayList<Card>(10);
 	}
-	public abstract void initCardList();
 	
 	public final void addCard(Card iCard)
 	{
@@ -64,13 +63,13 @@ public abstract class CardList {
 
 	@Override
 	public String toString() {
-		return "CardList [Deck=" + Deck + ", StartingWorlds=" + StartingWorlds
-				+ ", StartingBlueWorlds=" + StartingBlueWorlds
-				+ ", StartingRedWorlds=" + StartingRedWorlds + "]";
+		return "CardList [Deck["+Deck.size()+"]=" + Deck + ",\n StartingWorlds["+StartingWorlds.size()+"]=" + StartingWorlds
+				+ ",\n StartingBlueWorlds["+StartingBlueWorlds.size()+"]=" + StartingBlueWorlds
+				+ ",\n StartingRedWorlds["+StartingRedWorlds.size()+"]=" + StartingRedWorlds + "]";
 	}
 	
 
-	protected void initFromCsv(Resources res, Expansion iExp) throws FileNotFoundException
+	public void initFromCsv(Resources res, Expansion iExp) throws FileNotFoundException
 	{
 		Scanner scanner = new Scanner(res.openRawResource(R.raw.rftg_card_reference));
 	    try {
@@ -80,6 +79,7 @@ public abstract class CardList {
 	    	  }
 	    	  catch(Exception e)
 	    	  {
+	    		  e.printStackTrace();
 	    	  }
 	      }
 	    }
@@ -102,7 +102,6 @@ public abstract class CardList {
 		return GoodType.None;
 	}
 	private void processLineFromCsv(String nextLine, Expansion iExp) {
-		
 		String[] values = nextLine.split(";");
 		
 		if(values[0].equals("Name "))
@@ -125,12 +124,32 @@ public abstract class CardList {
 		boolean isProduction = false;
 		boolean isWorld = false;
 		boolean isMilitary = false;
+		boolean isStartHand = false;
 		
 		String name = "";
 		String graphicId = "";
 		
 		switch(values.length)
 		{
+		case 39:
+		case 38:
+		case 37:
+		case 36:
+		case 35:
+		case 34:
+		case 33:
+		case 32:
+		case 31:
+		case 30:
+		case 29:
+		case 28:
+		case 27:
+		case 26:
+		case 25:
+		case 24:
+		case 23:
+		case 22:
+		case 21:
 		case 20:
 			for(String aStr: values[19].split(","))
 			{
@@ -154,20 +173,6 @@ public abstract class CardList {
 		case 16:
 			for(String aStr: values[15].split(","))
 			{
-				GoodType targetType = getGoodType(aStr);
-				if(aStr.contains("Military"))
-				{
-					if(targetType.equals(GoodType.None))
-						targetType = GoodType.Any;
-					int index = aStr.indexOf("+");
-					int bonusValue = 0;
-					if(index != 0)
-						bonusValue = Integer.parseInt(aStr.substring(index));
-					index = aStr.indexOf("-");
-					if(index != 0)
-						bonusValue = -Integer.parseInt(aStr.substring(index));
-					powers.add(new BonusMilitary(targetType, bonusValue));
-				}
 				// TODO settle powers
 			}
 		case 15:
@@ -181,19 +186,25 @@ public abstract class CardList {
 				// TODO explore powers
 			}
 		case 13:
-			prestige = (values[12].contains("©"));
+			prestige = (values[12].equals("©"));
 		case 12:
-			vps = Integer.parseInt(values[11]);
+			if(!values[11].equals("*") && !values[11].isEmpty())
+				vps = Integer.parseInt(values[11]);
 		case 11:
-			cost = Integer.parseInt(values[10]);
+			if(!values[10].isEmpty())
+				cost = Integer.parseInt(values[10]);
 		case 10:
 			goodType = getGoodType(values[9]);
 		case 9:
 			isProduction = (values[8] == "Production");
 		case 8:
-			isStartBlue = (!values[7].equals(""));
+			isStartHand = values[7].isEmpty();
 		case 7:
-			isStartRed = (!values[6].equals(""));
+			if(!values[6].isEmpty())
+			{
+				isStartBlue = (Integer.parseInt(values[6])%2 == 0);
+				isStartRed = !isStartBlue;
+			}
 		case 6:
 			for(String aKeyword: values[5].split(" "))
 			{
@@ -224,25 +235,25 @@ public abstract class CardList {
 				}
 			}
 		case 5:
-			if(values[4].contains("Development"))
+			if(values[4].equals("Development"))
 				; // Default
-			if(values[4].contains("Military World"))
+			if(values[4].equals("Military World"))
 			{
 				isWorld = true;
 				isMilitary = true;
 			}
-			if(values[4].contains("Non-Military World"))
+			if(values[4].equals("Non-Military World"))
 				isWorld = true;
 		case 4:
 			quantity = Integer.parseInt(values[3]);
 		case 3:
-			if(values[2].contains("Base"))
+			if(values[2].equals("Base"))
 				exp = Expansion.BaseGame;
-			if(values[2].contains("BoW"))
+			if(values[2].equals("BoW"))
 				exp = Expansion.TheBrinkOfWard;
-			if(values[2].contains("GS"))
+			if(values[2].equals("GS"))
 				exp = Expansion.TheGatheringStorm;
-			if(values[2].contains("RvI"))
+			if(values[2].equals("RvI"))
 				exp = Expansion.RebelVsImperium;
 			if(!exp.equals(iExp))
 				return;
@@ -255,7 +266,6 @@ public abstract class CardList {
 		default:
 			break;
 		}
-		
 		for(int i=0; i<quantity; i++)
 		{
 			Card aCard;

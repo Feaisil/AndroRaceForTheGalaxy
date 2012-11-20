@@ -80,7 +80,7 @@ public class Card {
 				+ cost + ", victoryPoints=" + victoryPoints + ", prestige="
 				+ prestige + ", powers=" + powers + ", endGameBonus="
 				+ endGameBonus + ", keywords=" + keywords + ", owner=" + owner
-				+ "]";
+				+ "]\n";
 	}
 
 	public boolean hasPower(String iPower) {

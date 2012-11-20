@@ -27,7 +27,7 @@ public class Development extends Card {
 				+ ", isPrestige()=" + isPrestige() + ", getGraphicId()="
 				+ getGraphicId() + ", toString()=" + super.toString()
 				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
-				+ "]";
+				+ "]\n";
 	}
 
 }

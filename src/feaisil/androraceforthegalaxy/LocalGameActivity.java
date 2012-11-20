@@ -102,7 +102,7 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 			aPl2.addToHand(aCard);
 		for(Card aCard: aCl.getStartingRedWorlds())
 			aPl3.addToHand(aCard);
-		for(Card aCard: aCl.getDeck())
+		for(Card aCard: aCl.getStartingWorlds())
 			aPl4.addToHand(aCard);
 				
 		game.init();
