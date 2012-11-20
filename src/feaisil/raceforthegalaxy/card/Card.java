@@ -76,31 +76,11 @@ public class Card {
 
 	@Override
 	public String toString() {
-		final int _maxLen = 10;
-		StringBuilder _builder = new StringBuilder();
-		_builder.append("Card [");
-		if (name != null) {
-			_builder.append("_name=");
-			_builder.append(name);
-			_builder.append(", ");
-		}
-		_builder.append("_cost=");
-		_builder.append(cost);
-		_builder.append(", _victoryPoints=");
-		_builder.append(victoryPoints);
-		_builder.append(", ");
-		if (powers != null) {
-			_builder.append("_powers=");
-			_builder.append(powers.subList(0,
-					Math.min(powers.size(), _maxLen)));
-			_builder.append(", ");
-		}
-		if (owner != null) {
-			_builder.append("_owner=");
-			_builder.append(owner);
-		}
-		_builder.append("]");
-		return _builder.toString();
+		return "Card [name=" + name + ", graphicId=" + graphicId + ", cost="
+				+ cost + ", victoryPoints=" + victoryPoints + ", prestige="
+				+ prestige + ", powers=" + powers + ", endGameBonus="
+				+ endGameBonus + ", keywords=" + keywords + ", owner=" + owner
+				+ "]";
 	}
 
 	public boolean hasPower(String iPower) {

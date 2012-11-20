@@ -45,7 +45,8 @@ public class CardAdapter extends BaseAdapter {
 		if(idDefinitions == null)
 			initIdDefinitions();
 		
-		image.setImageResource(idDefinitions.get(((Card)getItem(position)).getName()));
+		if(idDefinitions.containsKey(((Card)getItem(position)).getName()))
+			image.setImageResource(idDefinitions.get(((Card)getItem(position)).getName()));
 		return image;
 	}
 

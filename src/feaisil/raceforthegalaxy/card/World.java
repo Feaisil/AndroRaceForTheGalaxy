@@ -9,24 +9,15 @@ import feaisil.raceforthegalaxy.victorypointbonus.EndGameBonus;
 public class World extends Card{
 	@Override
 	public String toString() {
-		StringBuilder _builder = new StringBuilder();
-		_builder.append("World [");
-		if (good != null) {
-			_builder.append("good=");
-			_builder.append(good);
-			_builder.append(", ");
-		}
-		if (goodType != null) {
-			_builder.append("goodType=");
-			_builder.append(goodType);
-			_builder.append(", ");
-		}
-		if (super.toString() != null) {
-			_builder.append("toString()=");
-			_builder.append(super.toString());
-		}
-		_builder.append("]");
-		return _builder.toString();
+		return "World [good=" + good + ", goodType=" + goodType + ", military="
+				+ military + ", production=" + production + ", getName()="
+				+ getName() + ", getCost()=" + getCost() + ", getPowers()="
+				+ getPowers() + ", getOwner()=" + getOwner()
+				+ ", getVictoryPoints()=" + getVictoryPoints()
+				+ ", isPrestige()=" + isPrestige() + ", getGraphicId()="
+				+ getGraphicId() + ", toString()=" + super.toString()
+				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
+				+ "]";
 	}
 	
 	private Card good;

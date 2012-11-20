@@ -1,6 +1,4 @@
-Name ;Graphic_id;Set;Qty;Type;Keywords;"Start 
-World";"Start 
-Hand";Production Type;Good;Cost/Defense;VPs;Prestige;Explore (I);Develop (II);Settle (III);Consume Trade ($);Consume (IV);Produce (V);Game End Bonus / Other Notes;Search:;Dev, mil +1/+2;Windfall, defense 1/2;Windfall, cost 1/2;World, ?;World, Alien good;Any, consume 2+ goods;World, defense 5+;Dev, 6/?;Any, takeover/defense;
+Name ;Graphic_id;Set;Qty;Type;Keywords;"Start World";"Start Hand";Production Type;Good;Cost/Defense;VPs;Prestige;Explore (I);Develop (II);Settle (III);Consume Trade ($);Consume (IV);Produce (V);Game End Bonus / Other Notes;Search:;Dev, mil +1/+2;Windfall, defense 1/2;Windfall, cost 1/2;World, ?;World, Alien good;Any, consume 2+ goods;World, defense 5+;Dev, 6/?;Any, takeover/defense;
 ABANDONED ALIEN UPLIFT CAMP;;RvI;1;Non-Military World;Alien Uplift;;;;;1;2;;Draw +1;;Genes cost -2, Genes military +2;;;;;;;;;;;;;;;
 ALIEN BOOBY TRAP;;BoW;1;Military World;Alien;;;;;1;1;¸;;;1 Prestige for Military +3;;;Discard 1 to produce 1 Alien windfall;;;;;;;;;;;;
 ALIEN BURIAL SITE;;BoW;1;Non-Military World;Alien;;;Production;Novelty;2;1;¸;;;;Draw +1 if Novelty sold;;Produce Novelty here;;;;;;;;;;;;

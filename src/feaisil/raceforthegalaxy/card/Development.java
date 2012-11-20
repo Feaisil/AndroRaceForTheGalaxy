@@ -21,14 +21,13 @@ public class Development extends Card {
 
 	@Override
 	public String toString() {
-		StringBuilder _builder = new StringBuilder();
-		_builder.append("Development [");
-		if (super.toString() != null) {
-			_builder.append("toString()=");
-			_builder.append(super.toString());
-		}
-		_builder.append("]");
-		return _builder.toString();
+		return "Development [getName()=" + getName() + ", getCost()="
+				+ getCost() + ", getPowers()=" + getPowers() + ", getOwner()="
+				+ getOwner() + ", getVictoryPoints()=" + getVictoryPoints()
+				+ ", isPrestige()=" + isPrestige() + ", getGraphicId()="
+				+ getGraphicId() + ", toString()=" + super.toString()
+				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
+				+ "]";
 	}
 
 }

@@ -64,33 +64,9 @@ public abstract class CardList {
 
 	@Override
 	public String toString() {
-		final int _maxLen = 10;
-		StringBuilder _builder = new StringBuilder();
-		_builder.append("CardList [");
-		if (Deck != null) {
-			_builder.append("Deck=");
-			_builder.append(Deck.subList(0, Math.min(Deck.size(), _maxLen)));
-			_builder.append(", ");
-		}
-		if (StartingWorlds != null) {
-			_builder.append("StartingWorlds=");
-			_builder.append(StartingWorlds.subList(0,
-					Math.min(StartingWorlds.size(), _maxLen)));
-			_builder.append(", ");
-		}
-		if (StartingBlueWorlds != null) {
-			_builder.append("StartingBlueWorlds=");
-			_builder.append(StartingBlueWorlds.subList(0,
-					Math.min(StartingBlueWorlds.size(), _maxLen)));
-			_builder.append(", ");
-		}
-		if (StartingRedWorlds != null) {
-			_builder.append("StartingRedWorlds=");
-			_builder.append(StartingRedWorlds.subList(0,
-					Math.min(StartingRedWorlds.size(), _maxLen)));
-		}
-		_builder.append("]");
-		return _builder.toString();
+		return "CardList [Deck=" + Deck + ", StartingWorlds=" + StartingWorlds
+				+ ", StartingBlueWorlds=" + StartingBlueWorlds
+				+ ", StartingRedWorlds=" + StartingRedWorlds + "]";
 	}
 	
 
@@ -126,124 +102,158 @@ public abstract class CardList {
 		return GoodType.None;
 	}
 	private void processLineFromCsv(String nextLine, Expansion iExp) {
-		System.out.println(nextLine);
+		
 		String[] values = nextLine.split(";");
-		for(int i=0; i<values.length; i++)
-			System.out.println(""+i+" : "+values[i]);
+		
 		if(values[0].equals("Name "))
 			return;
-		String name = values[0];
-		String graphicId = values[1];
-		Expansion exp = Expansion.BaseGame;
-		if(values[2].equals("Base"))
-			; // Default
-		if(values[2].equals("BoW"))
-			exp = Expansion.TheBrinkOfWard;
-		if(values[2].equals("GS"))
-			exp = Expansion.TheGatheringStorm;
-		if(values[2].equals("RvI"))
-			exp = Expansion.RebelVsImperium;
-		if(!exp.equals(iExp))
-			return;
+
+		List<EndGameBonus> endGameBonuses = new ArrayList<EndGameBonus>();
+		List<Power> powers = new ArrayList<Power>();
+		List<Keyword> keywords = new ArrayList<Keyword>();
 		
-		int quantity = Integer.parseInt(values[3]);
+		int vps = 0;
+		int cost = 0;
+		int quantity = 0;
+		
+		GoodType goodType = GoodType.None;
+		Expansion exp = Expansion.BaseGame;
+		
+		boolean prestige = false;
+		boolean isStartRed = false;
+		boolean isStartBlue = false;
+		boolean isProduction = false;
 		boolean isWorld = false;
 		boolean isMilitary = false;
-		if(values[4].equals("Development"))
-			; // Default
-		if(values[4].equals("Military World"))
-		{
-			isWorld = true;
-			isMilitary = true;
-		}
-		if(values[4].equals("Non-Military World"))
-			isWorld = true;
 		
-		List<Keyword> keywords = new ArrayList<Keyword>();
-		for(String aKeyword: values[5].split(" "))
-		{
-			if(aKeyword.equals("Alien"))
-			{
-				keywords.add(Keyword.Alien);
-				continue;
-			}
-			if(aKeyword.equals("Uplift"))
-			{
-				keywords.add(Keyword.Uplift);
-				continue;
-			}
-			if(aKeyword.equals("?"))
-			{
-				keywords.add(Keyword.Gene);
-				continue;
-			}
-			if(aKeyword.equals("Terraforming"))
-			{
-				keywords.add(Keyword.Terraforming);
-				continue;
-			}
-			if(aKeyword.equals("Rebel"))
-			{
-				keywords.add(Keyword.Rebel);
-				continue;
-			}
-		}
+		String name = "";
+		String graphicId = "";
 		
-		boolean isStartRed = (!values[6].equals(""));
-		boolean isStartBlue = (!values[7].equals(""));
-		
-		boolean isProduction = (values[8] == "Production");
-		
-		GoodType goodType = getGoodType(values[9]);
-
-		int cost = Integer.parseInt(values[10]);
-		int vps = Integer.parseInt(values[11]);
-		boolean prestige = (values[12].equals("©"));
-		
-		List<Power> powers = new ArrayList<Power>();
-		for(String aStr: values[13].split(";"))
+		switch(values.length)
 		{
-			// TODO explore powers
-		}
-		for(String aStr: values[14].split(";"))
-		{
-			// TODO develop powers
-		}
-		for(String aStr: values[15].split(";"))
-		{
-			GoodType targetType = getGoodType(aStr);
-			if(aStr.contains("Military"))
+		case 20:
+			for(String aStr: values[19].split(","))
 			{
-				if(targetType.equals(GoodType.None))
-					targetType = GoodType.Any;
-				int index = aStr.indexOf("+");
-				int bonusValue = 0;
-				if(index != 0)
-					bonusValue = Integer.parseInt(aStr.substring(index));
-				index = aStr.indexOf("-");
-				if(index != 0)
-					bonusValue = -Integer.parseInt(aStr.substring(index));
-				powers.add(new BonusMilitary(targetType, bonusValue));
+				// TODO game end bonus
 			}
-			// TODO settle powers
-		}
-		for(String aStr: values[16].split(";"))
-		{
-			// TODO consume trade powers
-		}
-		for(String aStr: values[17].split(";"))
-		{
-			// TODO consume powers
-		}
-		for(String aStr: values[18].split(";"))
-		{
-			// TODO produce powers
-		}
-		
-		List<EndGameBonus> endGameBonuses = new ArrayList<EndGameBonus>();
-		for(String aStr: values[19].split(";"))
-		{
-			// TODO game end bonus
+		case 19:
+			for(String aStr: values[18].split(","))
+			{
+				// TODO produce powers
+			}
+		case 18:
+			for(String aStr: values[17].split(","))
+			{
+				// TODO consume powers
+			}
+		case 17:
+			for(String aStr: values[16].split(","))
+			{
+				// TODO consume trade powers
+			}
+		case 16:
+			for(String aStr: values[15].split(","))
+			{
+				GoodType targetType = getGoodType(aStr);
+				if(aStr.contains("Military"))
+				{
+					if(targetType.equals(GoodType.None))
+						targetType = GoodType.Any;
+					int index = aStr.indexOf("+");
+					int bonusValue = 0;
+					if(index != 0)
+						bonusValue = Integer.parseInt(aStr.substring(index));
+					index = aStr.indexOf("-");
+					if(index != 0)
+						bonusValue = -Integer.parseInt(aStr.substring(index));
+					powers.add(new BonusMilitary(targetType, bonusValue));
+				}
+				// TODO settle powers
+			}
+		case 15:
+			for(String aStr: values[14].split(","))
+			{
+				// TODO develop powers
+			}
+		case 14:
+			for(String aStr: values[13].split(","))
+			{
+				// TODO explore powers
+			}
+		case 13:
+			prestige = (values[12].contains("©"));
+		case 12:
+			vps = Integer.parseInt(values[11]);
+		case 11:
+			cost = Integer.parseInt(values[10]);
+		case 10:
+			goodType = getGoodType(values[9]);
+		case 9:
+			isProduction = (values[8] == "Production");
+		case 8:
+			isStartBlue = (!values[7].equals(""));
+		case 7:
+			isStartRed = (!values[6].equals(""));
+		case 6:
+			for(String aKeyword: values[5].split(" "))
+			{
+				if(aKeyword.contains("Alien"))
+				{
+					keywords.add(Keyword.Alien);
+					continue;
+				}
+				if(aKeyword.contains("Uplift"))
+				{
+					keywords.add(Keyword.Uplift);
+					continue;
+				}
+				if(aKeyword.contains("?"))
+				{
+					keywords.add(Keyword.Gene);
+					continue;
+				}
+				if(aKeyword.contains("Terraforming"))
+				{
+					keywords.add(Keyword.Terraforming);
+					continue;
+				}
+				if(aKeyword.contains("Rebel"))
+				{
+					keywords.add(Keyword.Rebel);
+					continue;
+				}
+			}
+		case 5:
+			if(values[4].contains("Development"))
+				; // Default
+			if(values[4].contains("Military World"))
+			{
+				isWorld = true;
+				isMilitary = true;
+			}
+			if(values[4].contains("Non-Military World"))
+				isWorld = true;
+		case 4:
+			quantity = Integer.parseInt(values[3]);
+		case 3:
+			if(values[2].contains("Base"))
+				exp = Expansion.BaseGame;
+			if(values[2].contains("BoW"))
+				exp = Expansion.TheBrinkOfWard;
+			if(values[2].contains("GS"))
+				exp = Expansion.TheGatheringStorm;
+			if(values[2].contains("RvI"))
+				exp = Expansion.RebelVsImperium;
+			if(!exp.equals(iExp))
+				return;
+		case 2:
+			graphicId = values[1];
+			for(;graphicId.length()<3;)
+				graphicId = "0"+graphicId;
+		case 1:
+			name = values[0];
+		default:
+			break;
 		}
 		
 		for(int i=0; i<quantity; i++)

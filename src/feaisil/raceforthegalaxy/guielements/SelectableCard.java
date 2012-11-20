@@ -53,23 +53,32 @@ public class SelectableCard extends ImageButton {
 		    try {
 		      while ( scanner.hasNextLine() ){
 		    	  String aLine = (scanner.nextLine());
-		    	  String aId = aLine.split(";")[1];
-		    	  idDefinitions.put(aId, R.drawable.class.getField(aId).getInt(null));
-		      }
+		    	  
+		    	  String []values = aLine.split(";");
+		    	  if(values.length > 2 && !values[0].equals("Name "))
+	    		  {
+		    		  String aId = "rftg_card_";
+		    		  for(int i=0; i<3-values[1].length(); i++)
+		    				  aId+= "0";
+		    		  aId+=values[1];
+			    	  try{
+			    		  idDefinitions.put(aId, R.drawable.class.getField(aId).getInt(null));
+			    	  }catch (NoSuchFieldException e) {
+
+			    			System.out.println(e.toString());
+			    	  }
+	    		  }
+				}
 		    } catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (NoSuchFieldException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		    finally {
 		    	scanner.close();
 		    }
-			
 		}
 	}
 	
@@ -81,8 +90,11 @@ public class SelectableCard extends ImageButton {
 		if(idDefinitions == null)
 			initIdDefinitions(context);
 		
-		id = idDefinitions.get(iCard.getGraphicId());
-		setImageResource(id);
+		if(idDefinitions.containsKey(iCard.getGraphicId()))
+		{
+			id = idDefinitions.get(iCard.getGraphicId());
+			setImageResource(id);
+		}
 		setOnClickListener(new OnClickListener()
 			{
 				public void onClick(View v) {
