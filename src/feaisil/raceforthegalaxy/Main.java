@@ -1,6 +1,7 @@
 package feaisil.raceforthegalaxy;
 
-import feaisil.raceforthegalaxy.card.BaseCardList;
+import java.io.FileInputStream;
+
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.card.CardList;
 import feaisil.raceforthegalaxy.gui.CommandLineInterface;
@@ -18,9 +19,9 @@ public class Main {
 		LocalPlayer aPl2 = new LocalPlayer(cli, aGame);
 		LocalPlayer aPl3 = new LocalPlayer(cli, aGame);
 		
-		CardList aCl = new BaseCardList();
+		CardList aCl = new CardList();
 		
-		//aCl.initCardList();
+		aCl.initFromCsv( new FileInputStream("res/raw/rftg_card_reference"), Expansion.BaseGame);
 		
 		for(Card aCard: aCl.getStartingBlueWorlds())
 			aPl2.addToHand(aCard);
@@ -28,7 +29,7 @@ public class Main {
 			aPl3.addToHand(aCard);
 		
 		aGame.init();
-		aGame.playGame();
+		aGame.run();
 		
 		System.out.println(aGame);
 	}

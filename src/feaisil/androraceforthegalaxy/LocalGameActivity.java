@@ -1,15 +1,16 @@
 package feaisil.androraceforthegalaxy;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import feaisil.raceforthegalaxy.Expansion;
 import feaisil.raceforthegalaxy.Game;
 import feaisil.raceforthegalaxy.LocalPlayer;
 import feaisil.raceforthegalaxy.Player;
 import feaisil.raceforthegalaxy.PlayerInterface;
-import feaisil.raceforthegalaxy.card.BaseCardList;
-import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.card.CardList;
+import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.common.Action;
 import feaisil.raceforthegalaxy.common.PlayerColor;
 import feaisil.raceforthegalaxy.exception.ActiveGameException;
@@ -23,6 +24,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.app.Activity;
+import android.content.res.Resources.NotFoundException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,7 +56,7 @@ public class LocalGameActivity extends Activity  implements UserInterface{
         setContentView(R.layout.activity_local_game);
         
         try {
-        	if(game == null)
+        	if(Game.getCurrentInstance() == null)
         	{
                 cardImages = new ArrayList<SelectableCard>(12);
         		initGame();
@@ -93,9 +95,17 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		LocalPlayer aPl3 = new LocalPlayer(this, game);
 		LocalPlayer aPl4 = new LocalPlayer(this, game);
 
-		BaseCardList aCl = new BaseCardList();
+		CardList aCl = new CardList();
 		
-		aCl.initCardList(this.getResources());
+		try {
+			aCl.initFromCsv(getResources().openRawResource(R.raw.rftg_card_reference), Expansion.BaseGame);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println(aCl.toString());
 		
 		for(Card aCard: aCl.getStartingBlueWorlds())
@@ -131,11 +141,11 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		cards.add(new Card("Draw explore", "Draw explore", 0, 0, prestigeActionUsed, null, null, null));
 		cards.add(new Card("Keep explore", "Keep explore", 0, 0, prestigeActionUsed, null, null, null));
 		cards.add(new Card("Develop", "Develop", 0, 0, prestigeActionUsed, null, null, null));
-//		cards.add(new Card("Settle", 0, 0));
-//		cards.add(new Card("Consume trade", 0, 0));
-//		cards.add(new Card("Consume 2x VPs", 0, 0));
-//		cards.add(new Card("Produce", 0, 0));
-//		cards.add(new Card("Prestige/Search", 0, 0));
+		cards.add(new Card("Settle", "Settle", 0, 0, prestigeActionUsed, null, null, null));
+		cards.add(new Card("Consume trade", "Consume trade", 0, 0, prestigeActionUsed, null, null, null));
+		cards.add(new Card("Consume 2x VPs", "Consume 2x VPs", 0, 0, prestigeActionUsed, null, null, null));
+		cards.add(new Card("Produce", "Produce", 0, 0, prestigeActionUsed, null, null, null));
+		cards.add(new Card("Prestige/Search", "Prestige/Search", 0, 0, prestigeActionUsed, null, null, null));
 
 		final List<Card> finalCards = cards;
 		
@@ -202,7 +212,7 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		}
 	}
 	
-	public void switchToPlayer(final Player player) {
+	synchronized public void switchToPlayer(final Player player) {
 		runOnUiThread(new Runnable() {
             public void run() {
 				Toast.makeText(LocalGameActivity.this, "Changed to player "+player.getColor(), Toast.LENGTH_SHORT).show();
@@ -225,6 +235,9 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 
 	synchronized public Card chooseCardToDiscard(List<Card> cards) {
 		displayCardChooser(cards);
+
+		numberOfCardsToChoose = 1;
+		numberOfCardsChosen = 0;
 		
 		try {
 			// Todo register begin time and verify that action was completed

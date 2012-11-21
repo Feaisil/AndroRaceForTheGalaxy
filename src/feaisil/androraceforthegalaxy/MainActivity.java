@@ -2,9 +2,6 @@ package feaisil.androraceforthegalaxy;
 
 import java.io.FileNotFoundException;
 
-import feaisil.raceforthegalaxy.Expansion;
-import feaisil.raceforthegalaxy.card.BaseCardList;
-import feaisil.raceforthegalaxy.card.CardList;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;

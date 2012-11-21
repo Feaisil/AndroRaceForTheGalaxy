@@ -51,6 +51,11 @@ public final class Game implements Serializable, Runnable{
 	
 	public Game()
 	{
+		// stop current game instance if running
+		if(getCurrentInstance() != null)
+			getCurrentInstance().setGameActive(false);
+		setCurrentInstance(this);
+		
 		randGen 			= new Random();
 		seed 				= randGen.nextInt();
 		randGen.setSeed(seed);
@@ -204,61 +209,14 @@ public final class Game implements Serializable, Runnable{
 	
 	@Override
 	public String toString() {
-		final int _maxLen = 10;
-		StringBuilder _builder = new StringBuilder();
-		_builder.append("Game [seed=");
-		_builder.append(seed);
-		_builder.append(", ");
-		if (randGen != null) {
-			_builder.append("randGen=");
-			_builder.append(randGen);
-			_builder.append(", ");
-		}
-		_builder.append("advanced=");
-		_builder.append(advanced);
-		_builder.append(", ");
-		if (expansion != null) {
-			_builder.append("expansion=");
-			_builder.append(expansion);
-			_builder.append(", ");
-		}
-		_builder.append("goalsDisabled=");
-		_builder.append(goalsDisabled);
-		_builder.append(", takeOverDisabled=");
-		_builder.append(takeOverDisabled);
-		_builder.append(", ");
-		if (players != null) {
-			_builder.append("players=");
-			_builder.append(players.subList(0,
-					Math.min(players.size(), _maxLen)));
-			_builder.append(", ");
-		}
-		if (deck != null) {
-			_builder.append("deck=");
-			_builder.append(deck.subList(0, Math.min(deck.size(), _maxLen)));
-			_builder.append(", ");
-		}
-		if (discardPile != null) {
-			_builder.append("discardPile=");
-			_builder.append(discardPile.subList(0,
-					Math.min(discardPile.size(), _maxLen)));
-			_builder.append(", ");
-		}
-		if (temporary != null) {
-			_builder.append("temporary=");
-			_builder.append(temporary.subList(0,
-					Math.min(temporary.size(), _maxLen)));
-			_builder.append(", ");
-		}
-		_builder.append("remainingVp=");
-		_builder.append(remainingVp);
-		_builder.append(", ");
-		if (goals != null) {
-			_builder.append("goals=");
-			_builder.append(goals.subList(0, Math.min(goals.size(), _maxLen)));
-		}
-		_builder.append("]");
-		return _builder.toString();
+		return "Game [gameActive=" + gameActive + ", turn=" + turn
+				+ ", advanced=" + advanced + ", expansion=" + expansion
+				+ ", goalsDisabled=" + goalsDisabled + ", takeOverDisabled="
+				+ takeOverDisabled + ", seed=" + seed + ", randGen=" + randGen
+				+ ", maxDecisionTime=" + maxDecisionTime + ", maxTurnTime="
+				+ maxTurnTime + ", players=" + players + ", deck=" + deck
+				+ ", discardPile=" + discardPile + ", temporary=" + temporary
+				+ ", remainingVp=" + remainingVp + ", goals=" + goals + "]";
 	}
 
 	public void playGame() {

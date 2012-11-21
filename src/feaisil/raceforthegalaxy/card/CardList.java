@@ -2,6 +2,7 @@ package feaisil.raceforthegalaxy.card;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -69,9 +70,9 @@ public class CardList {
 	}
 	
 
-	public void initFromCsv(Resources res, Expansion iExp) throws FileNotFoundException
+	public void initFromCsv(InputStream iIs, Expansion iExp) throws FileNotFoundException
 	{
-		Scanner scanner = new Scanner(res.openRawResource(R.raw.rftg_card_reference));
+		Scanner scanner = new Scanner(iIs);
 	    try {
 	      while ( scanner.hasNextLine() ){
 	    	  try{
