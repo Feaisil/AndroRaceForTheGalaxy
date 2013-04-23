@@ -1,10 +1,11 @@
 package feaisil.raceforthegalaxy.exception;
 
-public class BaseException extends Exception {
+public class TooManyPlayersException extends BaseException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
 
 }

@@ -4,79 +4,118 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import android.content.res.Resources;
 
 import feaisil.androraceforthegalaxy.R;
 import feaisil.raceforthegalaxy.Expansion;
-import feaisil.raceforthegalaxy.common.GoodType;
-import feaisil.raceforthegalaxy.power.BonusMilitary;
-import feaisil.raceforthegalaxy.power.Power;
-import feaisil.raceforthegalaxy.victorypointbonus.EndGameBonus;
+import feaisil.raceforthegalaxy.card.power.BonusMilitary;
+import feaisil.raceforthegalaxy.card.power.IncreaseBoardLimit;
+import feaisil.raceforthegalaxy.card.power.Power;
+import feaisil.raceforthegalaxy.card.victorypointbonus.EndGameBonus;
+import feaisil.raceforthegalaxy.game.Action;
+import feaisil.raceforthegalaxy.game.PlayerColor;
 
 public class CardList {
+	private boolean initialized;
+	private int id;
 	private List<Card> Deck;
 	private List<Card> StartingWorlds;
 	private List<Card> StartingBlueWorlds;
 	private List<Card> StartingRedWorlds;
+	private List<Card> actionCards;
+	
+	private Map<String, Action> actionName;
 	
 	public CardList()
 	{
+		initialized = false;
+		id = 0;
 		Deck = new ArrayList<Card>(300);
 		StartingWorlds = new ArrayList<Card>(300);
 		StartingBlueWorlds = new ArrayList<Card>(10);
 		StartingRedWorlds = new ArrayList<Card>(10);
 	}
 	
-	public final void addCard(Card iCard)
+	private void addCard(Card iCard)
 	{
 		Deck.add(iCard);
 	}
-	public final  void addStartingBlueWorld(Card iCard)
+	private  void addStartingBlueWorld(Card iCard)
 	{
-		addCard(iCard);
 		StartingWorlds.add(iCard);
 		StartingBlueWorlds.add(iCard);
 	}
-	public final void addStartingRedWorld(Card iCard)
+	private void addStartingRedWorld(Card iCard)
 	{
-		addCard(iCard);
 		StartingWorlds.add(iCard);
 		StartingRedWorlds.add(iCard);
 	}
-	public final List<Card> getDeck() {
+	public List<Card> getDeck() {
 		return Deck;
 	}
 
-	public final List<Card> getStartingWorlds() {
+	public List<Card> getStartingWorlds() {
 		return StartingWorlds;
 	}
 
-	public final List<Card> getStartingBlueWorlds() {
+	public List<Card> getStartingBlueWorlds() {
 		return StartingBlueWorlds;
 	}
 
-	public final List<Card> getStartingRedWorlds() {
+	public List<Card> getStartingRedWorlds() {
 		return StartingRedWorlds;
 	}
-
-	@Override
-	public String toString() {
-		return "CardList [Deck["+Deck.size()+"]=" + Deck + ",\n StartingWorlds["+StartingWorlds.size()+"]=" + StartingWorlds
-				+ ",\n StartingBlueWorlds["+StartingBlueWorlds.size()+"]=" + StartingBlueWorlds
-				+ ",\n StartingRedWorlds["+StartingRedWorlds.size()+"]=" + StartingRedWorlds + "]";
-	}
 	
+	private void initActionName(){
+		if(actionName == null){
+			actionName = new HashMap<String, Action>();
+			actionName.put("Draw explore",Action.exploreDraw);
+			actionName.put("Keep explore", Action.exploreKeep);
+			actionName.put("Develop", Action.develop);
+			actionName.put("Settle", Action.settle);
+			actionName.put("Consume trade", Action.trade);
+			actionName.put("Consume 2x VPs", Action.consume);
+			actionName.put("Produce", Action.produce);
+			actionName.put("Prestige/Search", Action.search);
+		}
+	}
+	public List<Card> getActionCards(PlayerColor color) {
+		// TODO return cards depending of color
+		if(actionCards == null){
+			initActionName();
+			actionCards = new ArrayList<Card>();
 
-	public void initFromCsv(InputStream iIs, Expansion iExp) throws FileNotFoundException
+			// action cards
+			for(String str: actionName.keySet())
+				actionCards.add(
+					new Card(
+							id++,
+							str,
+							"action"+id,
+							0,0,false,null,null,null));
+		}
+		return actionCards;
+	}	
+	public Action getAction(String name){
+		initActionName();
+		return actionName.get(name);
+	}
+
+	public void initFromCsv(InputStream iIs, Set<Expansion> expansion) throws FileNotFoundException
 	{
+		if(initialized) return;
 		Scanner scanner = new Scanner(iIs);
 	    try {
 	      while ( scanner.hasNextLine() ){
 	    	  try{
-	    		  processLineFromCsv( scanner.nextLine() , iExp);
+	    		  processLineFromCsv( scanner.nextLine() , expansion);
 	    	  }
 	    	  catch(Exception e)
 	    	  {
@@ -87,6 +126,7 @@ public class CardList {
 	    finally {
 	    	scanner.close();
 	    }
+	    initialized = true;
 	}
 	private GoodType getGoodType(String str)
 	{
@@ -102,7 +142,7 @@ public class CardList {
 			return GoodType.Any;
 		return GoodType.None;
 	}
-	private void processLineFromCsv(String nextLine, Expansion iExp) {
+	private void processLineFromCsv(String nextLine, Set<Expansion> expansion) {
 		String[] values = nextLine.split(";");
 		
 		if(values[0].equals("Name "))
@@ -159,7 +199,7 @@ public class CardList {
 		case 19:
 			for(String aStr: values[18].split(","))
 			{
-				// TODO produce powers
+				powers.addAll(parseProducePowers(aStr));
 			}
 		case 18:
 			for(String aStr: values[17].split(","))
@@ -256,7 +296,7 @@ public class CardList {
 				exp = Expansion.TheGatheringStorm;
 			if(values[2].equals("RvI"))
 				exp = Expansion.RebelVsImperium;
-			if(!exp.equals(iExp))
+			if(!expansion.contains(exp))
 				return;
 		case 2:
 			graphicId = values[1];
@@ -273,8 +313,9 @@ public class CardList {
 			if(isWorld)
 			{
 				 aCard = new World(
+						 id++,
 						 name,
-						 "rftg_card_"+graphicId,
+						 graphicId,
 						 cost,
 						 vps,
 						 prestige,
@@ -294,8 +335,9 @@ public class CardList {
 			else
 			{
 				aCard = new Development(
+						id++,
 						name,
-						"rftg_card_"+graphicId,
+						graphicId,
 						cost,
 						vps,
 						prestige,
@@ -305,5 +347,15 @@ public class CardList {
 				 addCard(aCard);
 			}
 		}
+	}
+
+	private List<Power> parseProducePowers(String iString) {
+		List<Power> powers = new ArrayList<Power>();
+		for(String substr: iString.split("|"))
+		{
+			if(substr.equals("[You end the game when you reach 14 cards in tableau]"))
+				powers.add(new IncreaseBoardLimit());
+		}
+		return powers;
 	}
 }

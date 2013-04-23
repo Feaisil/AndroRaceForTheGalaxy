@@ -3,10 +3,11 @@ package feaisil.raceforthegalaxy.card;
 import java.util.ArrayList;
 import java.util.List;
  
-import feaisil.raceforthegalaxy.power.Power;
-import feaisil.raceforthegalaxy.victorypointbonus.EndGameBonus;
+import feaisil.raceforthegalaxy.card.power.Power;
+import feaisil.raceforthegalaxy.card.victorypointbonus.EndGameBonus;
 
 public class Card {
+	private int id;
 	private String name;
 	private String graphicId;
 	private int cost; // Cost or defense
@@ -17,8 +18,9 @@ public class Card {
 	private List<Keyword> keywords;
 	private Object owner;
 
-	public Card(
-			String iName, 
+	public Card( 
+			int id,
+			String iName,
 			String iGraphicId,
 			int iCost, 
 			int iVictoryPoints,
@@ -39,6 +41,7 @@ public class Card {
 		if(iKeywords != null)
 			keywords.addAll(iKeywords);
 		
+		this.id = id;
 		graphicId = iGraphicId;
 		prestige = iPrestige;
 		name = iName;
@@ -70,17 +73,11 @@ public class Card {
 	public boolean isPrestige() {
 		return prestige;
 	}
+	public int getId() {
+		return id;
+	}
 	public String getGraphicId() {
 		return graphicId;
-	}
-
-	@Override
-	public String toString() {
-		return "Card [name=" + name + ", graphicId=" + graphicId + ", cost="
-				+ cost + ", victoryPoints=" + victoryPoints + ", prestige="
-				+ prestige + ", powers=" + powers + ", endGameBonus="
-				+ endGameBonus + ", keywords=" + keywords + ", owner=" + owner
-				+ "]\n";
 	}
 
 	public boolean hasPower(String iPower) {

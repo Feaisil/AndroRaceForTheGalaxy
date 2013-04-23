@@ -2,23 +2,10 @@ package feaisil.raceforthegalaxy.card;
 
 import java.util.List;
 
-import feaisil.raceforthegalaxy.common.GoodType;
-import feaisil.raceforthegalaxy.power.Power;
-import feaisil.raceforthegalaxy.victorypointbonus.EndGameBonus;
+import feaisil.raceforthegalaxy.card.power.Power;
+import feaisil.raceforthegalaxy.card.victorypointbonus.EndGameBonus;
 
 public class World extends Card{
-	@Override
-	public String toString() {
-		return "World [good=" + good + ", goodType=" + goodType + ", military="
-				+ military + ", production=" + production + ", getName()="
-				+ getName() + ", getCost()=" + getCost() + ", getPowers()="
-				+ getPowers() + ", getOwner()=" + getOwner()
-				+ ", getVictoryPoints()=" + getVictoryPoints()
-				+ ", isPrestige()=" + isPrestige() + ", getGraphicId()="
-				+ getGraphicId() + ", toString()=" + super.toString()
-				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
-				+ "]\n";
-	}
 	
 	private Card good;
 	private GoodType goodType;
@@ -27,6 +14,7 @@ public class World extends Card{
 	private boolean production;
 	
 	public World(
+			int id,
 			String iName,
 			String iGraphicId,
 			int iCost, 
@@ -38,7 +26,7 @@ public class World extends Card{
 			List<Keyword> iKeywords,
 			List<Power> iPowers,
 			List<EndGameBonus> iEgb) {
-		super(iName, iGraphicId, iCost, iVictoryPoints, iPrestige, iKeywords, iPowers, iEgb);
+		super(id, iName, iGraphicId, iCost, iVictoryPoints, iPrestige, iKeywords, iPowers, iEgb);
 		
 		goodType = iGoodType;
 		good = null;
