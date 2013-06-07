@@ -20,8 +20,7 @@ public class BoardAndHandDisplay extends LinearLayout {
 		
 		public void init()
 		{
-			setNumColumns(6);
-			
+			setNumColumns(7);
 		}
 	}
 	

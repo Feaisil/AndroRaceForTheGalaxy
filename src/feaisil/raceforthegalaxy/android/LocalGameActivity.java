@@ -1,25 +1,22 @@
 package feaisil.raceforthegalaxy.android;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import feaisil.androraceforthegalaxy.R;
+import feaisil.raceforthegalaxy.android.R;
 import feaisil.raceforthegalaxy.Expansion;
-import feaisil.raceforthegalaxy.LocalPlayer;
 import feaisil.raceforthegalaxy.android.guielements.CardAdapter;
 import feaisil.raceforthegalaxy.android.guielements.SelectableCard;
-import feaisil.raceforthegalaxy.card.CardList;
 import feaisil.raceforthegalaxy.card.Card;
 import feaisil.raceforthegalaxy.exception.ActiveGameException;
 import feaisil.raceforthegalaxy.exception.TooManyPlayersException;
-import feaisil.raceforthegalaxy.game.Action;
 import feaisil.raceforthegalaxy.game.Game;
 import feaisil.raceforthegalaxy.game.Player;
-import feaisil.raceforthegalaxy.game.PlayerColor;
-import feaisil.raceforthegalaxy.game.PlayerInterface;
-import feaisil.raceforthegalaxy.gui.cli.ChooseAction;
-import feaisil.raceforthegalaxy.gui.cli.UserInterface;
+import feaisil.raceforthegalaxy.gui.PlayerUserInterface;
+import feaisil.raceforthegalaxy.gui.QueryType;
+import feaisil.raceforthegalaxy.gui.Warning;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,30 +35,55 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 
-public class LocalGameActivity extends Activity  implements UserInterface{
+public class LocalGameActivity extends Activity  implements PlayerUserInterface{
 	
 	private Game game;
-	
+	private Player currentPl;
 	private LocalGameActivity current = this;
 	
 	Handler showQueryDetailsHandler, displayCardToChooseHandler;
-	private int numberOfCardsToChoose;
-	private int numberOfCardsChosen;
+	private int numberOfCardsToChooseMin, numberOfCardsToChooseMax;
 	private List<SelectableCard> cardImages;
-
-    GridView vue;
+	private List<Card> selectedCards;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_game);
         
-        try {
-        	if(Game.getCurrentInstance() == null)
-        	{
-                cardImages = new ArrayList<SelectableCard>(12);
-        		initGame();
-        	}
+    	if(game != null)
+    		return;
+
+        cardImages = new ArrayList<SelectableCard>(12);
+        selectedCards = new ArrayList<Card>(12);
+        currentPl = null;
+		ArrayList<Expansion> expList = new ArrayList<Expansion>();
+                expList.add(Expansion.BaseGame);
+                expList.add(Expansion.RebelVsImperium);
+                expList.add(Expansion.TheBrinkOfWard);
+                expList.add(Expansion.TheGatheringStorm);
+		Game.Configuration aConfig = new Game.Configuration(
+				expList,
+				false,
+				false,
+				false, 
+				getResources().openRawResource(R.raw.rftg_card_reference));
+		final Game aGame = new Game(aConfig);
+		
+		try {
+			@SuppressWarnings("unused")
+			Player aPl1 = new Player(aGame, "God", this);
+			@SuppressWarnings("unused")
+			Player aPl2 = new Player(aGame, "Blatte", this);
+                        @SuppressWarnings("unused")
+                        Player aPl3 = new Player(aGame, "Mathieu", this);
+                        @SuppressWarnings("unused")
+                        Player aPl4 = new Player(aGame, "DD", this);
+                        @SuppressWarnings("unused")
+                        Player aPl5 = new Player(aGame, "Fanny", this);
+                        @SuppressWarnings("unused")
+                        Player aPl6 = new Player(aGame, "MLo", this);
 		} catch (TooManyPlayersException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -69,6 +91,22 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+			game = aGame;
+
+			this.findViewById(R.id.button1).setEnabled(false);
+			new Thread( new Runnable() {
+				public void run() 
+				{
+					try {
+						aGame.playGame();
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}).start();
+		
     }
 
 	@Override
@@ -76,7 +114,6 @@ public class LocalGameActivity extends Activity  implements UserInterface{
         getMenuInflater().inflate(R.menu.activity_local_game, menu);
         return true;
     }
-
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -88,80 +125,16 @@ public class LocalGameActivity extends Activity  implements UserInterface{
         return super.onOptionsItemSelected(item);
     }
 
-
-    private void initGame() throws TooManyPlayersException, ActiveGameException {
-    	game = new Game();
-    	
-		LocalPlayer aPl2 = new LocalPlayer(this, game);
-		LocalPlayer aPl3 = new LocalPlayer(this, game);
-		LocalPlayer aPl4 = new LocalPlayer(this, game);
-
-		CardList aCl = new CardList();
-		
-		try {
-			aCl.initFromCsv(getResources().openRawResource(R.raw.rftg_card_reference), Expansion.BaseGame);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println(aCl.toString());
-		
-		for(Card aCard: aCl.getStartingBlueWorlds())
-			aPl2.addToHand(aCard);
-		for(Card aCard: aCl.getStartingRedWorlds())
-			aPl3.addToHand(aCard);
-		for(Card aCard: aCl.getStartingWorlds())
-			aPl4.addToHand(aCard);
-				
-		game.init();
-		
-		vue = (GridView) findViewById(R.id.handlist);
-		ListAdapter adapter = new CardAdapter(aPl2.getHand(), getLayoutInflater());
-		vue.setAdapter(adapter);
-		
-		new Thread(game).start();
-    }
-
-	public void cardSelected(boolean selected) {
-		if(selected)
-			numberOfCardsChosen++;
+	public void cardSelected(SelectableCard cardView) {
+		if(cardView.isSelected())
+			selectedCards.add(cardView.getCard());
 		else
-			numberOfCardsChosen--;
-		this.findViewById(R.id.button1).setEnabled(numberOfCardsChosen == numberOfCardsToChoose);
+			selectedCards.remove(cardView.getCard());
+		this.findViewById(R.id.button1).setEnabled(
+				selectedCards.size() >= numberOfCardsToChooseMin &&
+				selectedCards.size() <= numberOfCardsToChooseMax);
 	}
 
-	synchronized public Action selectAction(boolean prestigeActionUsed) {
-		numberOfCardsToChoose = 1;
-		numberOfCardsChosen = 0;
-		// TODO Create true action card list
-		List<Card> cards = new ArrayList<Card>();
-		
-		cards.add(new Card("Draw explore", "Draw explore", 0, 0, prestigeActionUsed, null, null, null));
-		cards.add(new Card("Keep explore", "Keep explore", 0, 0, prestigeActionUsed, null, null, null));
-		cards.add(new Card("Develop", "Develop", 0, 0, prestigeActionUsed, null, null, null));
-		cards.add(new Card("Settle", "Settle", 0, 0, prestigeActionUsed, null, null, null));
-		cards.add(new Card("Consume trade", "Consume trade", 0, 0, prestigeActionUsed, null, null, null));
-		cards.add(new Card("Consume 2x VPs", "Consume 2x VPs", 0, 0, prestigeActionUsed, null, null, null));
-		cards.add(new Card("Produce", "Produce", 0, 0, prestigeActionUsed, null, null, null));
-		cards.add(new Card("Prestige/Search", "Prestige/Search", 0, 0, prestigeActionUsed, null, null, null));
-
-		final List<Card> finalCards = cards;
-		
-    	displayCardChooser(finalCards);
-		
-		try {
-			// Todo register begin time and verify that action was completed
-			wait(game.getMaxDecisionTime());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return Action.exploreKeep;
-	}
-	
 	public void displayCardChooser(final List<Card> iCards)
 	{
 		runOnUiThread(new Runnable() {
@@ -179,20 +152,56 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 					aLayout.addView(aImg);
 				}
 	
-				findViewById(R.id.button1).setEnabled(false);
-            }
-		});
-	}
-	
-	public void responseTimeOut() {
-		runOnUiThread(new Runnable() {
-            public void run() {
-              Toast.makeText(LocalGameActivity.this, "You reached the response timeout, default action will be used!", Toast.LENGTH_SHORT).show();
+				findViewById(R.id.button1).setEnabled(
+						selectedCards.size() >= numberOfCardsToChooseMin &&
+						selectedCards.size() <= numberOfCardsToChooseMax);
             }
 		});
 	}
 
-	int getPlayerColorConverted(final Player iPlayer)
+	public void displayHand()
+	{
+		runOnUiThread(new Runnable() {
+            public void run() {
+				LinearLayout aLayout = (LinearLayout)findViewById(R.id.handlayout);
+	
+				aLayout.removeAllViewsInLayout();
+	
+				cardImages = new ArrayList<SelectableCard>( currentPl.getHand().size());
+				for(Card aCard : currentPl.getHand())
+				{
+					SelectableCard aImg = new SelectableCard(current, aCard);
+	
+					aImg.setEnabled(false);
+					cardImages.add(aImg);
+					aLayout.addView(aImg);
+				}
+            }
+		});
+	}
+
+	public void displayBoard()
+	{
+		runOnUiThread(new Runnable() {
+            public void run() {
+				LinearLayout aLayout = (LinearLayout)findViewById(R.id.boardlayout);
+	
+				aLayout.removeAllViewsInLayout();
+	
+				cardImages = new ArrayList<SelectableCard>( currentPl.getBoard().size());
+				for(Card aCard : currentPl.getBoard())
+				{
+					SelectableCard aImg = new SelectableCard(current, aCard);
+	
+					aImg.setEnabled(false);
+					cardImages.add(aImg);
+					aLayout.addView(aImg);
+				}
+            }
+		});
+	}
+
+	private int getPlayerColorConverted(final Player iPlayer)
 	{
 		switch(iPlayer.getColor())
 		{
@@ -205,22 +214,24 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		case Green:
 			return (android.graphics.Color.GREEN);
 		case Pink:
-			return (android.graphics.Color.argb(0, 255, 100, 100));
+			return (android.graphics.Color.argb(255, 255, 100, 100));
 		case LightBlue:
-			return (android.graphics.Color.argb(0, 100, 100, 255));
-		default:
-			return 0;
+                default:
+			return (android.graphics.Color.argb(255, 100, 100, 255));
 		}
 	}
 	
-	synchronized public void switchToPlayer(final Player player) {
+	public void switchToPlayer(final Player player) {
+		if(player == currentPl)
+			return;
+		currentPl = player;
 		runOnUiThread(new Runnable() {
             public void run() {
-				Toast.makeText(LocalGameActivity.this, "Changed to player "+player.getColor(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(LocalGameActivity.this, "Changed to player "+currentPl.getClientId(), Toast.LENGTH_SHORT).show();
 				              
 				TextView aPlayerText = (TextView) findViewById(R.id.PlayerName);
-				aPlayerText.setText(player.getColor().toString());
-				aPlayerText.setTextColor(getPlayerColorConverted(player));
+				aPlayerText.setText(currentPl.getClientId());
+				aPlayerText.setTextColor(getPlayerColorConverted(currentPl));
             }
 		});
 	}
@@ -234,19 +245,90 @@ public class LocalGameActivity extends Activity  implements UserInterface{
 		notifyAll();
 	}
 
-	synchronized public Card chooseCardToDiscard(List<Card> cards) {
-		displayCardChooser(cards);
+	synchronized public List<Card> query(Player p, QueryType query, List<Card> cards,
+			int minCards, int maxCards)
+	{
+		System.out.println(""+p+cards);
+		switchToPlayer(p);
 
-		numberOfCardsToChoose = 1;
-		numberOfCardsChosen = 0;
+		final String aStr;
+		switch(query)
+		{
+		case startingPhaseChooseWorld:
+			aStr = "Choose your starting world";
+			break;
+		case startingPhaseDiscardHand:
+			aStr = "Discard two cards from your starting hand";
+			break;
+		case chooseAction:
+			aStr = "Choose an action to play";
+			break;
+		case exploreDiscard:
+			aStr = "Explore phase, discard cards";
+			break;
+		case developChoose:
+			aStr = "You may choose a card to develop";
+			break;
+		case developDiscard:
+			aStr = "Choose paiement for your development";
+			break;
+		case settleChoose:
+			aStr = "You may choose a card to settle";
+			break;
+		case settleDiscard:
+			aStr = "Explore phase, discard cards";
+			break;
+		case finalizeDiscardHand:
+			aStr = "Choose paiement for your settlement";
+			break;			
+		default:
+			aStr = "";
+		}
+
+		runOnUiThread(new Runnable() {
+            public void run() {				              
+				TextView aPlayerText = (TextView) findViewById(R.id.CurrentAction);
+				aPlayerText.setText(aStr);
+            }
+		});
+		
+		selectedCards.clear();
+		
+		displayCardChooser(cards);
+		displayBoard();
+		displayHand();
+
+		numberOfCardsToChooseMin = minCards;
+		numberOfCardsToChooseMax = maxCards;
 		
 		try {
-			// Todo register begin time and verify that action was completed
-			wait(game.getMaxDecisionTime());
+			wait();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return selectedCards;
+	}
+
+	public void sendWarning(Player p, Warning warning) {
+    	final String aStr;
+		switch(warning)
+		{
+		case PrestigeActionAlreadyUsed:
+			aStr="Prestige action already used!";
+			break;
+		case TwoActionSelectedButNotPrestige:
+			aStr="Two actions selected but none prestige!";
+			break;
+		default:
+			aStr="Unknown warning";
+		}
+		runOnUiThread(new Runnable() {
+            public void run()
+            {
+				Toast.makeText(LocalGameActivity.this, aStr, Toast.LENGTH_SHORT).show();
+            }
+		});
+		
 	}
 }

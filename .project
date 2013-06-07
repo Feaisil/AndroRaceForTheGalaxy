@@ -3,6 +3,7 @@
 	<name>AndroRaceForTheGalaxy</name>
 	<comment></comment>
 	<projects>
+		<project>RaceForTheGalaxy</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

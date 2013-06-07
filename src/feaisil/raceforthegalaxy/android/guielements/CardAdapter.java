@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import feaisil.androraceforthegalaxy.R;
+import feaisil.raceforthegalaxy.android.R;
 import feaisil.raceforthegalaxy.card.Card;
 import android.view.LayoutInflater;
 import android.view.View;

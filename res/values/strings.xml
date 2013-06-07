@@ -9,4 +9,16 @@
     <string name="title_activity_game">GameActivity</string>
     <string name="title_activity_local_game">LocalGameActivity</string>
 	<string name="display_hand">Display hand</string>
+	
+	<string name="startingPhaseChooseWorld">Choose your starting world</string>
+	<string name="startingPhaseDiscardHand">Discard two cards from your starting hand</string>
+	<string name="chooseAction">Choose an action to play</string>
+	<string name="exploreDiscard">Explore phase, discard cards</string>
+	<string name="developChoose">You may choose a card to develop</string>
+	<string name="developDiscard">Choose paiement for your development</string>
+	<string name="settleChoose">You may choose a card to settle</string>
+	<string name="settleDiscard">Explore phase, discard cards</string>
+	<string name="finalizeDiscardHand">Choose paiement for your settlement</string>
+	
+	<string name="None">             </string>
 </resources>

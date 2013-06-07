@@ -2,7 +2,7 @@ package feaisil.raceforthegalaxy.android;
 
 import java.io.FileNotFoundException;
 
-import feaisil.androraceforthegalaxy.R;
+import feaisil.raceforthegalaxy.android.R;
 
 import android.os.Bundle;
 import android.app.Activity;
